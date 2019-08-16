@@ -95,6 +95,9 @@ namespace DNetBot.Services
                 _logger.Log(log.level, log.message);
             };
 
+            // General message handling event
+            discordClient.MessageReceived += async m => await RecieveMessage(m);
+
             // Bot specific events
             discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);
             discordClient.ShardReady += async r => await ShardReady(r);
