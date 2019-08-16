@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using DNetBot.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -64,7 +65,7 @@ namespace DNetBot.Services
                 LogLevel = logLevel
             });
 
-            
+            ConfigureEventHandlers();
 
             discordClient.LoginAsync(Discord.TokenType.Bot, botToken).Wait();
             discordClient.StartAsync().Wait();
@@ -83,6 +84,42 @@ namespace DNetBot.Services
             _logger.LogInformation("OnStopped has been called.");
 
             // Perform post-stopped activities here
+        }
+
+        private void ConfigureEventHandlers()
+        {
+            // Set the Discord Client logging to use the system logger.
+            discordClient.Log += async l =>
+            {
+                var log = Formatter.GenerateLog(l);
+                _logger.Log(log.level, log.message);
+            };
+
+            // Bot specific events
+            discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);
+            discordClient.ShardReady += async r => await ShardReady(r);
+            discordClient.LoggedIn += async () => await LoggedIn();
+        }
+
+        private Task ShardReady(DiscordSocketClient client)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Shard Ready - Shard ID:" + client.ShardId);
+
+            return Task.CompletedTask;
+        }
+
+        private Task BotUpdated(SocketSelfUser oldBot, SocketSelfUser newBot)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Bot Updated - " + newBot.ToString());
+
+            return Task.CompletedTask;
+        }
+
+        private Task LoggedIn()
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Client Logged In");
+
+            return Task.CompletedTask;
         }
     }
 }
