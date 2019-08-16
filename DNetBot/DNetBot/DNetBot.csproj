@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
@@ -18,4 +19,15 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="**\*.json" Exclude="bin\**\*;obj\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Config\appsettings.Development.json" />
+    <None Remove="Config\appsettings.json" />
+    <None Remove="Config\appsettings.Production.json" />
+    <None Remove="Config\hostsettings.json" />
+  </ItemGroup>
+  
 </Project>
