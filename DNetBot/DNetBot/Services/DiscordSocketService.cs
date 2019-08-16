@@ -95,6 +95,37 @@ namespace DNetBot.Services
                 _logger.Log(log.level, log.message);
             };
 
+            // Events that occur when a bot is added or removed from a server
+            discordClient.JoinedGuild += async g => await GuildJoin(g);
+            discordClient.LeftGuild += async g => await GuildJoin(g);
+
+            // Events that occur when a server information changes
+            discordClient.GuildAvailable += async g => await GuildAvailable(g);
+            discordClient.GuildUpdated += async (o, n) => await GuildUpdate(o, n);
+            discordClient.GuildUnavailable += async g => await GuildUnAvailable(g);
+
+            // Events that occur on a server when channel information changes
+            discordClient.ChannelCreated += async c => await ChannelCreated(c);
+            discordClient.ChannelUpdated += async (o, n) => await ChannelUpdated(o, n);
+            discordClient.ChannelDestroyed += async c => await ChannelDeleted(c);
+            discordClient.RecipientAdded += async r => await ChannelJoined(r);
+            discordClient.RecipientRemoved += async r => await ChannelLeft(r);
+
+            // Events that occur on a server when role information changes
+            discordClient.RoleCreated += async r => await RoleCreated(r);
+            discordClient.RoleUpdated += async (o, n) => await RoleUpdated(o, n);
+            discordClient.RoleDeleted += async r => await RoleDeleted(r);
+
+            // Events that occur when user information on a server changes
+            discordClient.UserBanned += async (u, g) => await UserBan(u, g);
+            discordClient.UserUnbanned += async (u, g) => await UserUnban(u, g);
+
+            // User based events
+            discordClient.UserJoined += async u => await UserJoined(u);
+            discordClient.UserLeft += async u => await UserLeft(u);
+            discordClient.UserUpdated += async (o, n) => await UserUpdate(o, n);
+            discordClient.GuildMemberUpdated += async (o, n) => await MemberUpdate(o, n);
+
             // General message handling event
             discordClient.MessageReceived += async m => await RecieveMessage(m);
 
