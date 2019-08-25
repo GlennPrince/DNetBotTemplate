@@ -27,7 +27,7 @@ namespace DNetBot.Services
         private CloudQueue inboundQueue;
 
         private string serviceBusConnectionString;
-        const string QueueName = "gamemasterbotmessagequeue";
+        const string QueueName = "dnetbotmessagequeue";
         static IQueueClient servicebusClient;
 
         public DiscordSocketService(

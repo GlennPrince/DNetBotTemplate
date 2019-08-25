@@ -13,7 +13,7 @@ namespace DNetBotFunctions
     public static class ProcessMessages
     {
         [FunctionName("InboundMessageProcess")]
-        [return: ServiceBus("gamemasterbotmessagequeue", Connection = "AzureWebJobsServiceBus")]
+        [return: ServiceBus("dnetbotmessagequeue", Connection = "AzureWebJobsServiceBus")]
         public static string InboundMessageProcess([QueueTrigger("discord-bot-inbound-queue")] CloudQueueMessage myQueueItem, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
