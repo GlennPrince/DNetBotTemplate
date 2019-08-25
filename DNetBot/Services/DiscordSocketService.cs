@@ -1,12 +1,13 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using DNetBot.Helpers;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,14 @@ namespace DNetBot.Services
         private DiscordShardedClient discordClient;
         private string botToken;
 
+        private CloudStorageAccount storageAccount;
+        private CloudQueueClient queueClient;
+        private CloudQueue inboundQueue;
+
+        private string serviceBusConnectionString;
+        const string QueueName = "gamemasterbotmessagequeue";
+        static IQueueClient servicebusClient;
+
         public DiscordSocketService(
             ILogger<DiscordSocketService> logger,
             IApplicationLifetime appLifetime,
@@ -30,6 +39,7 @@ namespace DNetBot.Services
             _appLifetime = appLifetime;
             _config = config;
             botToken = _config["DISCORD_BOT_TOKEN"];
+            serviceBusConnectionString = _config["AzureWebJobsServiceBus"];
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -59,6 +69,9 @@ namespace DNetBot.Services
             else if (_config["LOGLEVEL"] == "ERROR")
                 logLevel = LogSeverity.Error;
 
+            ConfigureStorageQueue();
+            ConfigureServiceBus();
+
             // Setup the Discord Client Configuration
             discordClient = new DiscordShardedClient(new DiscordSocketConfig
             {
@@ -77,6 +90,7 @@ namespace DNetBot.Services
 
             // Perform on-stopping activities here
             discordClient.LogoutAsync();
+            servicebusClient.CloseAsync();
         }
 
         private void OnStopped()
@@ -84,6 +98,45 @@ namespace DNetBot.Services
             _logger.LogInformation("OnStopped has been called.");
 
             // Perform post-stopped activities here
+        }
+
+        private void ConfigureStorageQueue()
+        {
+            // Try and load the queue storage account
+            try
+            {
+                storageAccount = CloudStorageAccount.Parse(_config["StorageQueueConnectionString"]);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return;
+            }
+
+            queueClient = storageAccount.CreateCloudQueueClient();
+            inboundQueue = queueClient.GetQueueReference("discord-bot-inbound-queue");
+            inboundQueue.CreateIfNotExistsAsync();
+        }
+
+        private void ConfigureServiceBus()
+        {
+            servicebusClient = new QueueClient(serviceBusConnectionString, QueueName);
+            var handlerOptions = new MessageHandlerOptions(SBException)            
+            {
+                MaxConcurrentCalls = 1,
+                AutoComplete = false
+            };
+
+            servicebusClient.RegisterMessageHandler(ProcessMessage, handlerOptions);
+        }
+
+        private Task SBException(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        {
+            _logger.LogError("ServiceBus Error | Endpoint: " 
+                + exceptionReceivedEventArgs.ExceptionReceivedContext.Endpoint + " | " 
+                + exceptionReceivedEventArgs.Exception.Message);
+
+            return Task.CompletedTask;
         }
 
         private void ConfigureEventHandlers()

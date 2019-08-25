@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNetBot", "DNetBot\DNetBot.csproj", "{9AEE947D-2C59-4E7E-A30F-D350C27B0DA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNetBot", "DNetBot\DNetBot.csproj", "{9AEE947D-2C59-4E7E-A30F-D350C27B0DA7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNetBotFunctions", "DNetBotFunctions\DNetBotFunctions.csproj", "{0417A64C-0DF3-46C2-AC71-BF69664BA94C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNetUtils", "DNetUtils\DNetUtils.csproj", "{1E9A16A6-050E-46AE-AEE9-D5F3FB6EED30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{9AEE947D-2C59-4E7E-A30F-D350C27B0DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AEE947D-2C59-4E7E-A30F-D350C27B0DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AEE947D-2C59-4E7E-A30F-D350C27B0DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0417A64C-0DF3-46C2-AC71-BF69664BA94C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0417A64C-0DF3-46C2-AC71-BF69664BA94C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0417A64C-0DF3-46C2-AC71-BF69664BA94C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0417A64C-0DF3-46C2-AC71-BF69664BA94C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E9A16A6-050E-46AE-AEE9-D5F3FB6EED30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E9A16A6-050E-46AE-AEE9-D5F3FB6EED30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E9A16A6-050E-46AE-AEE9-D5F3FB6EED30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E9A16A6-050E-46AE-AEE9-D5F3FB6EED30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

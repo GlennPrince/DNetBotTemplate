@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.0.1" />
+    <PackageReference Include="Discord.Net" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Azure.Storage.Common" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="3.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
@@ -28,6 +31,10 @@
     <None Remove="Config\appsettings.json" />
     <None Remove="Config\appsettings.Production.json" />
     <None Remove="Config\hostsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DNetUtils\DNetUtils.csproj" />
   </ItemGroup>
   
 </Project>
