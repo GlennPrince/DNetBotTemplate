@@ -19,6 +19,7 @@ To use this bot locally, in the DNetBot project create a Config\hostsettings.jso
 ```
 You also need create a Config\local.settings.json file with the following settings:
 
+```
 {
     "IsEncrypted": false,
   "Values": {
@@ -28,5 +29,6 @@ You also need create a Config\local.settings.json file with the following settin
     "AzureWebJobsServiceBus": "<YOUR BOT TOKEN>"
   }
 }
+```
 
 You can then build and run the application locally in development / debug mode. Currently the application will only respond to the !ping command with pong!.
