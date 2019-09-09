@@ -24,7 +24,8 @@ namespace DNetBot.Services
 
         private CloudStorageAccount storageAccount;
         private CloudQueueClient queueClient;
-        private CloudQueue inboundQueue;
+        private CloudQueue discordMessagesQueue;
+        private CloudQueue discordActivityQueue;
 
         private string serviceBusConnectionString;
         const string QueueName = "dnetbotmessagequeue";
@@ -114,8 +115,11 @@ namespace DNetBot.Services
             }
 
             queueClient = storageAccount.CreateCloudQueueClient();
-            inboundQueue = queueClient.GetQueueReference("discord-bot-inbound-queue");
-            inboundQueue.CreateIfNotExistsAsync();
+            discordMessagesQueue = queueClient.GetQueueReference("discord-messages-inbound-queue");
+            discordMessagesQueue.CreateIfNotExistsAsync();
+
+            discordActivityQueue = queueClient.GetQueueReference("discord-activity-inbound-queue");
+            discordActivityQueue.CreateIfNotExistsAsync();
         }
 
         private void ConfigureServiceBus()

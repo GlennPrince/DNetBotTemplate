@@ -25,11 +25,12 @@ namespace DNetBot.Services
 
             try
             {
-                inboundQueue.AddMessage(jsonMessage);
+                discordMessagesQueue.AddMessage(jsonMessage);
+                discordActivityQueue.AddMessage(jsonMessage);
             }
             catch (Exception ex)
             {
-                Formatter.GenerateLog(_logger, LogSeverity.Error, "QueueMessage", "Unable to add message to Queue: " + inboundQueue.Name 
+                Formatter.GenerateLog(_logger, LogSeverity.Error, "QueueMessage", "Unable to add message to Queue: " + discordMessagesQueue.Name 
                     + " | Error: " + ex.Message + " | Inner: " + ex.InnerException.Message);
             }
 

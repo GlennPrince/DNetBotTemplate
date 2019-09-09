@@ -8,6 +8,7 @@ namespace DNetUtils.Entities
 {
     public class ConvertedMessage
     {
+        public ulong MessageId { get; set; }
         public ulong AuthorId { get; set; }
         public ulong ChannelId { get; set; }
         public MessageSource Source { get; set; } // System, User, Bot, Webhook
@@ -21,6 +22,7 @@ namespace DNetUtils.Entities
 
         public ConvertedMessage(SocketMessage message)
         {
+            MessageId = message.Id;
             AuthorId = message.Author.Id;
             ChannelId = message.Channel.Id;
             Source = message.Source;
