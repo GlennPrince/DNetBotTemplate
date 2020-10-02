@@ -1,9 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using DNetBot.Helpers;
-using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Queue;
+using Microsoft.Azure.EventGrid;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,14 +21,11 @@ namespace DNetBot.Services
         private DiscordShardedClient discordClient;
         private string botToken;
 
-        private CloudStorageAccount storageAccount;
-        private CloudQueueClient queueClient;
-        private CloudQueue discordMessagesQueue;
-        private CloudQueue discordActivityQueue;
-
-        private string serviceBusConnectionString;
-        const string QueueName = "dnetbotmessagequeue";
-        static IQueueClient servicebusClient;
+        private string eventGridDomainEndpoint;
+        private string eventGridDomainAccessKey;
+        private string eventGridDomainHostname;
+        private static EventGridClient eventGridClient;
+        private TopicCredentials eventGridCredentials;
 
         public DiscordSocketService(
             ILogger<DiscordSocketService> logger,
@@ -40,7 +36,8 @@ namespace DNetBot.Services
             _appLifetime = appLifetime;
             _config = config;
             botToken = _config["DISCORD_BOT_TOKEN"];
-            serviceBusConnectionString = _config["AzureWebJobsServiceBus"];
+            eventGridDomainEndpoint = _config["EventGridDomainEndPoint"];
+            eventGridDomainAccessKey = _config["eventGridDomainAccessKey"];
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -70,8 +67,7 @@ namespace DNetBot.Services
             else if (_config["LOGLEVEL"] == "ERROR")
                 logLevel = LogSeverity.Error;
 
-            ConfigureStorageQueue();
-            ConfigureServiceBus();
+            ConfigureEventGrid();
 
             // Setup the Discord Client Configuration
             discordClient = new DiscordShardedClient(new DiscordSocketConfig
@@ -91,7 +87,6 @@ namespace DNetBot.Services
 
             // Perform on-stopping activities here
             discordClient.LogoutAsync();
-            servicebusClient.CloseAsync();
         }
 
         private void OnStopped()
@@ -101,46 +96,14 @@ namespace DNetBot.Services
             // Perform post-stopped activities here
         }
 
-        private void ConfigureStorageQueue()
+        private void ConfigureEventGrid()
         {
-            // Try and load the queue storage account
-            try
-            {
-                storageAccount = CloudStorageAccount.Parse(_config["StorageQueueConnectionString"]);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-                return;
-            }
-
-            queueClient = storageAccount.CreateCloudQueueClient();
-            discordMessagesQueue = queueClient.GetQueueReference("discord-messages-inbound-queue");
-            discordMessagesQueue.CreateIfNotExistsAsync();
-
-            discordActivityQueue = queueClient.GetQueueReference("discord-activity-inbound-queue");
-            discordActivityQueue.CreateIfNotExistsAsync();
-        }
-
-        private void ConfigureServiceBus()
-        {
-            servicebusClient = new QueueClient(serviceBusConnectionString, QueueName);
-            var handlerOptions = new MessageHandlerOptions(SBException)            
-            {
-                MaxConcurrentCalls = 1,
-                AutoComplete = false
-            };
-
-            servicebusClient.RegisterMessageHandler(ProcessMessage, handlerOptions);
-        }
-
-        private Task SBException(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
-        {
-            _logger.LogError("ServiceBus Error | Endpoint: " 
-                + exceptionReceivedEventArgs.ExceptionReceivedContext.Endpoint + " | " 
-                + exceptionReceivedEventArgs.Exception.Message);
-
-            return Task.CompletedTask;
+            _logger.LogInformation("Configuring EventGrid | Endpoint: " + eventGridDomainEndpoint);
+            eventGridDomainHostname = new Uri(eventGridDomainEndpoint).Host;
+            _logger.LogInformation("Configuring EventGrid | Domain Hostname: " + eventGridDomainHostname);
+            eventGridCredentials = new TopicCredentials(eventGridDomainAccessKey);
+            eventGridClient = new EventGridClient(eventGridCredentials);
+            _logger.LogInformation("Configuring EventGrid | EventGrid Client Version: " + eventGridClient.ApiVersion);
         }
 
         private void ConfigureEventHandlers()
