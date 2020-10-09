@@ -15,7 +15,7 @@ namespace DNetBot.Services
     public partial class DiscordSocketService : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly IApplicationLifetime _appLifetime;
+        private readonly IHostApplicationLifetime _appLifetime;
         private readonly IConfiguration _config;
 
         private DiscordShardedClient discordClient;
@@ -29,7 +29,7 @@ namespace DNetBot.Services
 
         public DiscordSocketService(
             ILogger<DiscordSocketService> logger,
-            IApplicationLifetime appLifetime,
+            IHostApplicationLifetime appLifetime,
             IConfiguration config)
         {
             _logger = logger;
@@ -147,7 +147,7 @@ namespace DNetBot.Services
             discordClient.GuildMemberUpdated += async (o, n) => await MemberUpdate(o, n);
 
             // General message handling event
-            discordClient.MessageReceived += async m => await RecieveMessage(m);
+            discordClient.MessageReceived += async m => await ReceiveMessage(m);
 
             // Bot specific events
             discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);
