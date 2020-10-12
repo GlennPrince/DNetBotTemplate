@@ -20,10 +20,10 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "New Message From : " + message.Source.ToString() + " | Message Content: " + message.Content);
             var serializedMessage = DiscordConvert.SerializeObject(message);
 
-            return SendEvent("messages", "NewMessage", "GameMasterBot.Message", serializedMessage);
+            return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", serializedMessage);
         }
 
-        private async Task SendMessage(NewMessage message)
+        public async Task SendMessage(NewMessage message)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Sending message -- Channel: " + message.ChannelId + " -- Content: " + message.Content);
 
