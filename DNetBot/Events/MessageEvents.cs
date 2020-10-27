@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using DNetBot.Helpers;
 using DNetUtils.Entities;
-using DNetUtils.Helpers;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
@@ -18,12 +17,12 @@ namespace DNetBot.Services
         private Task ReceiveMessage(SocketMessage message)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "New Message From : " + message.Source.ToString() + " | Message Content: " + message.Content);
-            var serializedMessage = DiscordConvert.SerializeObject(message);
+            var serializedMessage = new DiscordMessage(message).ToString();
 
             return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", serializedMessage);
         }
 
-        public async Task SendMessage(NewMessage message)
+        public async Task SendMessage(DiscordMessage message)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Sending message -- Channel: " + message.ChannelId + " -- Content: " + message.Content);
 

@@ -154,26 +154,5 @@ namespace DNetBot.Services
             discordClient.ShardReady += async r => await ShardReady(r);
             discordClient.LoggedIn += async () => await LoggedIn();
         }
-
-        private Task ShardReady(DiscordSocketClient client)
-        {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Shard Ready - Shard ID:" + client.ShardId);
-
-            return Task.CompletedTask;
-        }
-
-        private Task BotUpdated(SocketSelfUser oldBot, SocketSelfUser newBot)
-        {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Bot Updated - " + newBot.ToString());
-
-            return Task.CompletedTask;
-        }
-
-        private Task LoggedIn()
-        {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Client Logged In");
-
-            return Task.CompletedTask;
-        }
     }
 }

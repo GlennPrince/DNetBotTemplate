@@ -1,7 +1,5 @@
-﻿using DNetBot.Services;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.IO;
@@ -13,7 +11,7 @@ namespace DNetBot
     {
         public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build().RunAsync();
+            await CreateHostBuilder(args).Build().RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -46,7 +44,7 @@ namespace DNetBot
                     {
                         logging.AddConsole();
                         logging.AddDebug();
-                    });
+                    }).UseContentRoot("webroot").UseKestrel();
                 })
                 .UseConsoleLifetime();
     }

@@ -17,7 +17,7 @@ namespace DNetBot.Services
             return Task.CompletedTask;
         }
 
-        // Handles the bot being initally removed from a guild / server
+        // Handles the bot being initially removed from a guild / server
         private Task GuildLeave(SocketGuild guild)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Left Guild: " + guild.Id);
