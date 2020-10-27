@@ -3,13 +3,12 @@ using DNetUtils.Entities;
 using DNetUtils.Helpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 
 namespace DNetBotFunctions
 {
+    /*
     public static class ProcessMessages
     {
         [FunctionName("InboundMessageProcess")]
@@ -30,4 +29,5 @@ namespace DNetBotFunctions
             return null;
         }
     }
+    */
 }

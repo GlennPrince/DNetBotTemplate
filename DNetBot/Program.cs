@@ -1,4 +1,5 @@
 ﻿using DNetBot.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,7 +13,11 @@ namespace DNetBot
     {
         public static async Task Main(string[] args)
         {
-            var host = new HostBuilder()
+            var host = CreateHostBuilder(args).Build().RunAsync();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
                 .ConfigureHostConfiguration(configHost =>
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
@@ -29,20 +34,20 @@ namespace DNetBot
                     configApp.AddEnvironmentVariables(prefix: "BOT_");
                     configApp.AddCommandLine(args);
                 })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddHostedService<DiscordSocketService>();
-                })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
                     configLogging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
                     configLogging.AddConsole();
                     configLogging.AddDebug();
                 })
-                .UseConsoleLifetime()
-                .Build();
-
-            await host.RunAsync();
-        }
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>().ConfigureLogging(logging =>
+                    {
+                        logging.AddConsole();
+                        logging.AddDebug();
+                    });
+                })
+                .UseConsoleLifetime();
     }
 }

@@ -3,8 +3,6 @@ using Discord.WebSocket;
 using DNetBot.Helpers;
 using DNetUtils.Entities;
 using DNetUtils.Helpers;
-using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
@@ -17,40 +15,26 @@ namespace DNetBot.Services
     public partial class DiscordSocketService : IHostedService
     {
         // Handles any actions when a message is received by the bot
-        private Task RecieveMessage(SocketMessage message)
+        private Task ReceiveMessage(SocketMessage message)
         {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", message.Source.ToString() + " : " + message.Content);
-            
-            CloudQueueMessage jsonMessage = new CloudQueueMessage(DiscordConvert.SerializeObject(message));
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "New Message From : " + message.Source.ToString() + " | Message Content: " + message.Content);
+            var serializedMessage = DiscordConvert.SerializeObject(message);
 
-            try
-            {
-                discordMessagesQueue.AddMessage(jsonMessage);
-                discordActivityQueue.AddMessage(jsonMessage);
-            }
-            catch (Exception ex)
-            {
-                Formatter.GenerateLog(_logger, LogSeverity.Error, "QueueMessage", "Unable to add message to Queue: " + discordMessagesQueue.Name 
-                    + " | Error: " + ex.Message + " | Inner: " + ex.InnerException.Message);
-            }
-
-            return Task.CompletedTask;
+            return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", serializedMessage);
         }
 
-        private async Task ProcessMessage(Message message, CancellationToken token)
+        public async Task SendMessage(NewMessage message)
         {
-            var bodyString = Encoding.UTF8.GetString(message.Body);
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Sending message - Sequence: " + message.SystemProperties.SequenceNumber + " -- Message: " + bodyString);
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Sending message -- Channel: " + message.ChannelId + " -- Content: " + message.Content);
 
             try
             {
-                NewMessage response = JsonConvert.DeserializeObject(bodyString, typeof(NewMessage)) as NewMessage;
-                var channel = discordClient.GetChannel(response.ChannelId);
+                var channel = discordClient.GetChannel(message.ChannelId);
 
                 ITextChannel textChannel = channel as ITextChannel;
                 if (textChannel != null)
                 {
-                    await textChannel.SendMessageAsync(response.Content);
+                    await textChannel.SendMessageAsync(message.Content);
                 }
                 else
                 {
@@ -61,8 +45,6 @@ namespace DNetBot.Services
             {
                 Formatter.GenerateLog(_logger, LogSeverity.Error, "Self", "Error sending message: " + ex.Message);
             }
-
-            await servicebusClient.CompleteAsync(message.SystemProperties.LockToken);
         }
     }
 }
