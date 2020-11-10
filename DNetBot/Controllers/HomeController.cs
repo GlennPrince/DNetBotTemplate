@@ -23,11 +23,5 @@ namespace DNetBot.Controllers
         {
             return new string[] { "BotName:", "DNet Bot" };
         }
-
-        [HttpPost]
-        public string Post()
-        {
-            return "Post Worked";
-        }
     }
 }

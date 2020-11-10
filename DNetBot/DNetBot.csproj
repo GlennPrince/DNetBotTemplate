@@ -30,5 +30,11 @@
   <ItemGroup>
     <ProjectReference Include="..\DNetUtils\DNetUtils.csproj" />
   </ItemGroup>
+       
+  <ItemGroup>
+    <Content Include="webroot\**"> 
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
+    </Content> 
+  </ItemGroup>
   
 </Project>

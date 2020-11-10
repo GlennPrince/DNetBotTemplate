@@ -1,7 +1,5 @@
 using System;
 using DNetUtils.Entities;
-using DNetUtils.Helpers;
-using DNetUtils.TableEntities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;

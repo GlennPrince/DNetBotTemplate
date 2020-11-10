@@ -1,0 +1,160 @@
+# ------------------------------------------------------------
+# GitHub Action to Deploy the DNet Bot to an Azure Environment
+# ------------------------------------------------------------
+# 
+# Modify the Environment Variables below if you want to change
+# any of the default values, otherwise the following secrets
+# need to be set to ensure the GitHub actions can connect and
+# build into your Azure tenancy:
+#
+# AZURE_CREDENTIALS - The Service Principle details for Azure
+# SUBSCRIPTION_ID - Your Subscription ID
+
+name: DeployDNetBot
+
+on:
+    push:
+        branches:
+            - master
+
+# Configuration Items
+# -------------------
+# These Variables Change based on the Environment you are 
+# deploying to. You also need to set the secrets above.
+env:
+    # DNet Bot Naming Prefix for Resources
+    DNETBOT_NAME: 'DNetBot'
+    # SDK Version to use
+    DOTNET_VERSION: '3.1.x'
+    # Resource Location
+    AZURE_LOCATION: ''
+    # Resource Group Name to use
+    AZURE_RG: 'RG-DnetBot'
+    # Size of the WebApp to deploy
+    AZURE_WEB_SKU: 'F1'
+
+jobs:
+    deploy-azure-infrastructure:
+        runs-on: ubuntu-latest
+        steps:
+            # Login via the Azure Module
+            - name: Login via Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+
+            # Deploy Storage Components First
+            - name: Deploy Azure Storage Components
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: {{ env.AZURE_RG }}
+                template: ./azure-storage.json
+                parameters:
+                    location=${{ env.AZURE_LOCATION }}
+                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
+
+            # Deploy Monitoring Resources
+            - name: Deploy Azure Monitoring Components
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: {{ env.AZURE_RG }}
+                template: ./azure-monitoring.json
+                parameters:
+                    location=${{ env.AZURE_LOCATION }}
+                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
+
+            # Deploy EventGrid Resources
+            - name: Deploy Azure EventGrid Components
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: {{ env.AZURE_RG }}
+                template: ./azure-eventgrid.json
+                parameters:
+                    location=${{ env.AZURE_LOCATION }}
+                    eventgGridDomainName=${{ env.DNETBOT_NAME }}_EventGridDomain
+
+            # Deploy Function Resources
+            - name: Deploy Azure Function Components
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: {{ env.AZURE_RG }}
+                template: ./azure-functions.json
+                parameters:
+                    funcAppName=${{ env.DNETBOT_NAME }}_Funcs
+                    location=${{ env.AZURE_LOCATION }}
+                    runtime=dotnet
+                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
+                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
+
+            # Deploy WebApp Resources
+            - name: Deploy Azure WebApp Components
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: {{ env.AZURE_RG }}
+                template: ./azure-functions.json
+                parameters:
+                    webAppName=${{ env.DNETBOT_NAME }}_Proxy
+                    location=${{ env.AZURE_LOCATION }}
+                    sku=${{ env.AZURE_WEB_SKU }}
+                    runtime=dotnet
+                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
+                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
+
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            # Check out the source code from the main branch
+            - name: Check Out Main
+            uses: actions/checkout@main
+
+            # Login via the Azure Module
+            - name: Login via Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+    
+            # Retrieve Secrets from Azure Secret Vault
+    
+            # Setup Dotnet Core
+            - name: Configure DotNet Core
+            uses: actions/setup-dotnet@v1
+            with:
+                dotnet-version: ${{ env.DOTNET_VERSION }} 
+
+            # Run DotNet Build and Publish for DNetBot
+            - name: dotnet build and publish
+            run: |
+                dotnet restore
+                dotnet build DNetBot --configuration Release
+                dotnet publish -c Release -o './DNetBot'
+
+            # Run DotNet Build and Publish for DNetBotFunctions
+            - name: dotnet build and publish
+            run: |
+                dotnet restore
+                dotnet build DNetBotFunctions --configuration Release
+                dotnet publish -c Release -o './DNetBotFunctions'
+
+            # Deploy the DNetBot WebApp
+            - name: 'Deploy DnetBot WebApp'
+            uses: azure/webapps-deploy@v2
+            with: 
+                app-name: $${{ env.DNETBOT_NAME }}_Proxy
+                publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
+                package: './DNetBot'
+
+            # Deploy the DNetBot Functions
+            - name: 'Run Azure Functions Action'
+            uses: Azure/functions-action@v1
+            id: fa
+            with:
+                app-name: ${{ env.DNETBOT_NAME }}_Funcs
+                package: './DNetBotFunctions'
+                publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}

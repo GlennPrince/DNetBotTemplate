@@ -29,28 +29,25 @@ namespace DNetBot.Controllers
         }
 
         // POST: /api/EventGrid/ReturnMessage
-        [HttpPost]
+        [HttpPost("returnmessage")]
         public IActionResult ReturnMessage([FromBody] EventGridEvent[] events)
         {
-            _logger.Log(LogLevel.Information, "Event Grid Event Received");
             foreach (var eventGridEvent in events)
             {
-                _logger.Log(LogLevel.Information, "Type:" + eventGridEvent.EventType.ToString() + " | Event Grid Object:" + eventGridEvent.Data.ToString());
+                _logger.Log(LogLevel.Information, "Event Grid Event Received. Type: " + eventGridEvent.EventType.ToString());
+
                 // 1. If there is no EventType through a bad request
                 if (eventGridEvent == null) return BadRequest();
 
                 // 2. If the EventType is the Event Grid handshake event, respond with a SubscriptionValidationResponse.
                 else if (eventGridEvent.EventType == EventTypes.EventGridSubscriptionValidationEvent)
-                {
-                    var payload = JsonConvert.DeserializeObject<SubscriptionValidationEventData>(eventGridEvent.Data.ToString());
-                    var response = new SubscriptionValidationResponse(payload.ValidationCode);
-                    return Ok(response);
-                }
+                    return Ok(ValidateWebHook(eventGridEvent.Data));
+
                 // 3. If the EventType is a return message, send a message to Discord
                 else if (eventGridEvent.EventType == "DNetBot.Message.ReturnMessage")
                 {
-                    var message = JsonConvert.DeserializeObject<NewMessage>(eventGridEvent.Data.ToString());
-                    var task = _discordSocketService.SendMessage(message);
+                    var message = JsonConvert.DeserializeObject<DiscordMessage>(eventGridEvent.Data.ToString());
+                    _discordSocketService.SendMessage(message).Wait();
                     return Ok();
                 }
                 else
@@ -59,5 +56,10 @@ namespace DNetBot.Controllers
             return Ok();
         }
 
+        private SubscriptionValidationResponse ValidateWebHook(object eventGridData)
+        {
+            var payload = JsonConvert.DeserializeObject<SubscriptionValidationEventData>(eventGridData.ToString());
+            return new SubscriptionValidationResponse(payload.ValidationCode);
+        }
     }
 }

@@ -1,0 +1,32 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventGridName": {
+          "type": "String",
+          "defaultValue": "[concat('eventgrid-', uniqueString(resourceGroup().id))]",
+        },
+        "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Location for all resources."
+        }
+    }
+    },
+    "variables": {
+        "eventgGridDomainName": "[parameters('eventGridName')]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.EventGrid/domains",
+        "apiVersion": "2020-06-01",
+        "name": "[variables('eventgGridDomainName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "inputSchema": "EventGridSchema",
+          "publicNetworkAccess": "Enabled"
+        }
+      }
+    ]
+}

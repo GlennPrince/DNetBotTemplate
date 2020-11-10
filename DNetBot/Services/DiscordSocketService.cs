@@ -148,32 +148,13 @@ namespace DNetBot.Services
 
             // General message handling event
             discordClient.MessageReceived += async m => await ReceiveMessage(m);
+            discordClient.MessageDeleted += async (m, c) => await DeletedMessage(m.Id, c);
+            discordClient.MessageUpdated += async (m, u, c) => await UpdatedMessage(m.Id, u, c);
 
             // Bot specific events
             discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);
             discordClient.ShardReady += async r => await ShardReady(r);
             discordClient.LoggedIn += async () => await LoggedIn();
-        }
-
-        private Task ShardReady(DiscordSocketClient client)
-        {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Shard Ready - Shard ID:" + client.ShardId);
-
-            return Task.CompletedTask;
-        }
-
-        private Task BotUpdated(SocketSelfUser oldBot, SocketSelfUser newBot)
-        {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Bot Updated - " + newBot.ToString());
-
-            return Task.CompletedTask;
-        }
-
-        private Task LoggedIn()
-        {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Client Logged In");
-
-            return Task.CompletedTask;
         }
     }
 }
