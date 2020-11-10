@@ -16,6 +16,9 @@ on:
     push:
         branches:
             - master
+    pull:
+        branches:
+            - master
 
 # Configuration Items
 # -------------------
