@@ -148,6 +148,8 @@ namespace DNetBot.Services
 
             // General message handling event
             discordClient.MessageReceived += async m => await ReceiveMessage(m);
+            discordClient.MessageDeleted += async (m, c) => await DeletedMessage(m.Id, c);
+            discordClient.MessageUpdated += async (m, u, c) => await UpdatedMessage(m.Id, u, c);
 
             // Bot specific events
             discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);

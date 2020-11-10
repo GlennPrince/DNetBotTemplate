@@ -7,7 +7,6 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using DNetUtils.Entities;
-using DNetUtils.Helpers;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid;
 using System.Runtime.CompilerServices;
@@ -23,10 +22,10 @@ namespace DNetBotFunctions.Messaging
         public static void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
         {
             log.LogInformation("New Message Event Triggered On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
-            Message message = DiscordConvert.DeSerializeObject(eventGridEvent.Data.ToString());
+            DiscordMessage message = new DiscordMessage(eventGridEvent.Data.ToString());
             if (message.Content.StartsWith("!ping"))
             {
-                var returnMessage = new Message();
+                var returnMessage = new DiscordMessage();
                 returnMessage.ChannelId = message.ChannelId;
                 returnMessage.Content = "pong!";        
 

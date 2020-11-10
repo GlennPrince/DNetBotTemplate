@@ -27,6 +27,7 @@ namespace DNetUtils.Entities
         public bool IsSelfDeafened { get; set; }
         public DateTimeOffset? JoinedAt { get; set; }
         public string Nickname { get; set; }
+        public ulong Permissions { get; set; }
 
         public DiscordUser() { }
         public DiscordUser(SocketUser user)
@@ -70,6 +71,7 @@ namespace DNetUtils.Entities
             IsMuted = user.IsMuted;
             IsSelfDeafened = user.IsSelfDeafened;
             JoinedAt = user.JoinedAt;
+            Permissions = user.GuildPermissions.RawValue;
         }
 
         public DiscordUser(RestGuildUser user)
@@ -87,6 +89,32 @@ namespace DNetUtils.Entities
             IsDeafened = user.IsDeafened;
             IsMuted = user.IsMuted;
             JoinedAt = user.JoinedAt;
+
+            Permissions = user.GuildPermissions.RawValue;
+        }
+
+        public DiscordUser(SocketSelfUser user)
+        {
+            ID = user.Id;
+            Discriminator = user.Discriminator;
+            Username = user.Username;
+            Status = user.Status;
+            IsBot = user.IsBot;
+
+            ActivityType = user.Activity.Type;
+            ActivityName = user.Activity.Name;
+        }
+
+        public DiscordUser(RestSelfUser user)
+        {
+            ID = user.Id;
+            Discriminator = user.Discriminator;
+            Username = user.Username;
+            Status = user.Status;
+            IsBot = user.IsBot;
+
+            ActivityType = user.Activity.Type;
+            ActivityName = user.Activity.Name;
         }
 
         /// <summary> 

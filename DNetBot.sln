@@ -11,6 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNetUtils", "DNetUtils\DNet
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AD10D3A3-986E-4B25-A206-5EB9AF18FC09}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflow\azure-deployment.yml = .github\workflow\azure-deployment.yml
+		azure-dnet-eventgrid.json = azure-dnet-eventgrid.json
+		azure-dnet-functions.json = azure-dnet-functions.json
+		azure-dnet-monitoring.json = azure-dnet-monitoring.json
+		azure-dnet-storage.json = azure-dnet-storage.json
+		azure-dnet-webapp.json = azure-dnet-webapp.json
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection

@@ -13,7 +13,7 @@ namespace DNetUtils.Entities
         public string Name { get; set; }
 
         public Color Color { get; set; }
-        public GuildPermissions Permissions { get; set; }
+        public ulong Permissions { get; set; }
         public string Mention { get; set; }
         public int Position { get; set; }
 
@@ -29,14 +29,14 @@ namespace DNetUtils.Entities
             GuildID = role.Guild.Id;
             Name = role.Name;
             Color = role.Color;
-            Permissions = role.Permissions;
+            Permissions = role.Permissions.RawValue;
             Mention = role.Mention;
             Position = role.Position;
 
             IsEveryone = role.IsEveryone;
             IsManaged = role.IsManaged;
             IsMentionable = role.IsMentionable;
-
+            
             MemberIDs = new List<ulong>();
             foreach (var member in role.Members)
                 MemberIDs.Add(member.Id);
@@ -47,7 +47,7 @@ namespace DNetUtils.Entities
             ID = role.Id;
             Name = role.Name;
             Color = role.Color;
-            Permissions = role.Permissions;
+            Permissions = role.Permissions.RawValue;
             Mention = role.Mention;
             Position = role.Position;
 

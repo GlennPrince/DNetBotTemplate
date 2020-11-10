@@ -18,8 +18,23 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "New Message From : " + message.Source.ToString() + " | Message Content: " + message.Content);
             var serializedMessage = new DiscordMessage(message).ToString();
-
             return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", serializedMessage);
+        }
+
+        private Task DeletedMessage(ulong messageId, ISocketMessageChannel channel)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Message Deleted From Channel ID : " + channel.Id.ToString() + " | Message Id: " + messageId);
+            var newMessage = new DiscordMessage();
+            newMessage.ChannelId = channel.Id;
+            newMessage.MessageId = messageId;
+            return SendEvent("messages", "DeletedMessage", "DNetBot.Message.Deleted", newMessage.ToString());
+        }
+
+        private Task UpdatedMessage(ulong messageId, SocketMessage message, ISocketMessageChannel channel)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Message Updated From Channel ID : " + channel.Id.ToString() + " | Message Content: " + message.Content);
+            var serializedMessage = new DiscordMessage(message).ToString();
+            return SendEvent("messages", "UpdatedMessage", "DNetBot.Message.Updated", serializedMessage.ToString());
         }
 
         public async Task SendMessage(DiscordMessage message)
