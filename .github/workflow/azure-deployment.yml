@@ -14,8 +14,9 @@ name: DeployDNetBot
 
 on:
     push:
-        branches:
+        branches:        
             - master
+            - develop
     pull:
         branches:
             - master
