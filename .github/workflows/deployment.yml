@@ -39,14 +39,14 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             # Login via the Azure Module
-            - name: Login via Azure Module
+            - name: 'Login via Azure Module'
             uses: azure/login@v1
             with:
                 creds: ${{secrets.AZURE_CREDENTIALS}}
                 enable-AzPSSession: true
 
             # Deploy Storage Components First
-            - name: Deploy Azure Storage Components
+            - name: 'Deploy Azure Storage Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -57,7 +57,7 @@ jobs:
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
 
             # Deploy Monitoring Resources
-            - name: Deploy Azure Monitoring Components
+            - name: 'Deploy Azure Monitoring Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -68,7 +68,7 @@ jobs:
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
 
             # Deploy EventGrid Resources
-            - name: Deploy Azure EventGrid Components
+            - name: 'Deploy Azure EventGrid Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -79,7 +79,7 @@ jobs:
                     eventgGridDomainName=${{ env.DNETBOT_NAME }}_EventGridDomain
 
             # Deploy Function Resources
-            - name: Deploy Azure Function Components
+            - name: 'Deploy Azure Function Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -93,7 +93,7 @@ jobs:
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
 
             # Deploy WebApp Resources
-            - name: Deploy Azure WebApp Components
+            - name: 'Deploy Azure WebApp Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -111,11 +111,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             # Check out the source code from the main branch
-            - name: Check Out Main
+            - name: 'Check Out Main'
             uses: actions/checkout@main
 
             # Login via the Azure Module
-            - name: Login via Azure Module
+            - name: 'Login via Azure Module'
             uses: azure/login@v1
             with:
                 creds: ${{secrets.AZURE_CREDENTIALS}}
@@ -124,20 +124,20 @@ jobs:
             # Retrieve Secrets from Azure Secret Vault
     
             # Setup Dotnet Core
-            - name: Configure DotNet Core
+            - name: 'Configure DotNet Core'
             uses: actions/setup-dotnet@v1
             with:
                 dotnet-version: ${{ env.DOTNET_VERSION }} 
 
             # Run DotNet Build and Publish for DNetBot
-            - name: dotnet build and publish
+            - name: 'Dotnet build and publish for WebApp'
             run: |
                 dotnet restore
                 dotnet build DNetBot --configuration Release
                 dotnet publish -c Release -o './DNetBot'
 
             # Run DotNet Build and Publish for DNetBotFunctions
-            - name: dotnet build and publish
+            - name: 'Sotnet build and publish for Functions'
             run: |
                 dotnet restore
                 dotnet build DNetBotFunctions --configuration Release
