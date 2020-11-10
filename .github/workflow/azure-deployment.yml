@@ -14,12 +14,9 @@ name: DeployDNetBot
 
 on:
     push:
-        branches:        
-            - master
-            - develop
-    pull:
-        branches:
-            - master
+        branches: [ master, development ]
+    pull_request:
+        branches: [ master ]
 
 # Configuration Items
 # -------------------
@@ -31,7 +28,7 @@ env:
     # SDK Version to use
     DOTNET_VERSION: '3.1.x'
     # Resource Location
-    AZURE_LOCATION: ''
+    AZURE_LOCATION: 'us-east'
     # Resource Group Name to use
     AZURE_RG: 'RG-DnetBot'
     # Size of the WebApp to deploy
