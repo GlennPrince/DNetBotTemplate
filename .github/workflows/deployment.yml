@@ -23,30 +23,25 @@ on:
 # These Variables Change based on the Environment you are 
 # deploying to. You also need to set the secrets above.
 env:
-    # DNet Bot Naming Prefix for Resources
-    DNETBOT_NAME: 'DNetBot'
-    # SDK Version to use
-    DOTNET_VERSION: '3.1.x'
-    # Resource Location
-    AZURE_LOCATION: 'us-east'
-    # Resource Group Name to use
-    AZURE_RG: 'RG-DnetBot'
-    # Size of the WebApp to deploy
-    AZURE_WEB_SKU: 'F1'
+    DNETBOT_NAME: 'DNetBot'                                                         # DNet Bot Naming Prefix for Resources
+    DOTNET_VERSION: '3.1.x'                                                         # SDK Version to use
+    AZURE_LOCATION: 'us-east'                                                       # Resource Location
+    AZURE_RG: 'RG-DnetBot'                                                          # Resource Group Name to use
+    AZURE_WEB_SKU: 'F1'                                                             # Size of the WebApp to deploy
 
 jobs:
     deploy-azure-infrastructure:
+        name: 'Deploy Azure Infrastructure'
         runs-on: ubuntu-latest
         steps:
-            # Login via the Azure Module
-            - name: 'Login via Azure Module'
+          - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
             with:
                 creds: ${{secrets.AZURE_CREDENTIALS}}
                 enable-AzPSSession: true
 
             # Deploy Storage Components First
-            - name: 'Deploy Azure Storage Components'
+          - name: 'Deploy Azure Storage Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -57,7 +52,7 @@ jobs:
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
 
             # Deploy Monitoring Resources
-            - name: 'Deploy Azure Monitoring Components'
+          - name: 'Deploy Azure Monitoring Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -68,7 +63,7 @@ jobs:
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
 
             # Deploy EventGrid Resources
-            - name: 'Deploy Azure EventGrid Components'
+          - name: 'Deploy Azure EventGrid Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -79,7 +74,7 @@ jobs:
                     eventgGridDomainName=${{ env.DNETBOT_NAME }}_EventGridDomain
 
             # Deploy Function Resources
-            - name: 'Deploy Azure Function Components'
+          - name: 'Deploy Azure Function Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -93,7 +88,7 @@ jobs:
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
 
             # Deploy WebApp Resources
-            - name: 'Deploy Azure WebApp Components'
+          - name: 'Deploy Azure WebApp Components'
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
@@ -107,15 +102,22 @@ jobs:
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
 
+            # Logout of Azure CLI
+          - name: logout
+            run: az logout
+
+
     build-and-deploy:
+        name: 'Build and Deploy DNet Bot'
+        needs: deploy-azure-infrastructure
         runs-on: ubuntu-latest
         steps:
             # Check out the source code from the main branch
-            - name: 'Check Out Main'
+          - name: 'Check Out Main'
             uses: actions/checkout@main
 
             # Login via the Azure Module
-            - name: 'Login via Azure Module'
+          - name: 'Login via Azure Module'
             uses: azure/login@v1
             with:
                 creds: ${{secrets.AZURE_CREDENTIALS}}
@@ -124,38 +126,40 @@ jobs:
             # Retrieve Secrets from Azure Secret Vault
     
             # Setup Dotnet Core
-            - name: 'Configure DotNet Core'
+          - name: 'Configure DotNet Core'
             uses: actions/setup-dotnet@v1
             with:
                 dotnet-version: ${{ env.DOTNET_VERSION }} 
 
             # Run DotNet Build and Publish for DNetBot
-            - name: 'Dotnet build and publish for WebApp'
+          - name: 'Dotnet build and publish for WebApp'
             run: |
                 dotnet restore
                 dotnet build DNetBot --configuration Release
                 dotnet publish -c Release -o './DNetBot'
 
             # Run DotNet Build and Publish for DNetBotFunctions
-            - name: 'Sotnet build and publish for Functions'
+          - name: 'Sotnet build and publish for Functions'
             run: |
                 dotnet restore
                 dotnet build DNetBotFunctions --configuration Release
                 dotnet publish -c Release -o './DNetBotFunctions'
 
             # Deploy the DNetBot WebApp
-            - name: 'Deploy DnetBot WebApp'
+          - name: 'Deploy DnetBot WebApp'
             uses: azure/webapps-deploy@v2
-            with: 
+            with:
                 app-name: $${{ env.DNETBOT_NAME }}_Proxy
-                publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
                 package: './DNetBot'
 
             # Deploy the DNetBot Functions
-            - name: 'Run Azure Functions Action'
+          - name: 'Run Azure Functions Action'
             uses: Azure/functions-action@v1
             id: fa
             with:
                 app-name: ${{ env.DNETBOT_NAME }}_Funcs
                 package: './DNetBotFunctions'
-                publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+            
+            # Logout of Azure CLI
+          - name: logout
+            run: az logout
