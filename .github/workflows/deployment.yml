@@ -45,7 +45,7 @@ jobs:
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
+                resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-storage.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
@@ -56,7 +56,7 @@ jobs:
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
+                resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-monitoring.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
@@ -67,7 +67,7 @@ jobs:
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
+                resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-eventgrid.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
@@ -78,7 +78,7 @@ jobs:
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
+                resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-functions.json
                 parameters:
                     funcAppName=${{ env.DNETBOT_NAME }}_Funcs
@@ -92,7 +92,7 @@ jobs:
             uses: azure/arm-deploy@v1
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
+                resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-functions.json
                 parameters:
                     webAppName=${{ env.DNETBOT_NAME }}_Proxy
@@ -149,7 +149,7 @@ jobs:
           - name: 'Deploy DnetBot WebApp'
             uses: azure/webapps-deploy@v2
             with:
-                app-name: $${{ env.DNETBOT_NAME }}_Proxy
+                app-name: ${{ env.DNETBOT_NAME }}_Proxy
                 package: './DNetBot'
 
             # Deploy the DNetBot Functions
