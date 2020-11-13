@@ -50,7 +50,7 @@ jobs:
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
                 resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-storage.json
+                template: ./azure-dnet-storage.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
@@ -61,7 +61,7 @@ jobs:
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
                 resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-monitoring.json
+                template: ./azure-dnet-monitoring.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
@@ -72,7 +72,7 @@ jobs:
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
                 resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-eventgrid.json
+                template: ./azure-dnet-eventgrid.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
                     eventgGridDomainName=${{ env.DNETBOT_NAME }}_EventGridDomain
@@ -83,7 +83,7 @@ jobs:
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
                 resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-functions.json
+                template: ./azure-dnet-functions.json
                 parameters:
                     funcAppName=${{ env.DNETBOT_NAME }}_Funcs
                     location=${{ env.AZURE_LOCATION }}
@@ -97,7 +97,7 @@ jobs:
             with:
                 subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
                 resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-functions.json
+                template: ./azure-dnet-webapp.json
                 parameters:
                     webAppName=${{ env.DNETBOT_NAME }}_Proxy
                     location=${{ env.AZURE_LOCATION }}
@@ -105,11 +105,6 @@ jobs:
                     runtime=dotnet
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
                     appStorageName=${{ env.DNETBOT_NAME }}_Storage
-
-            # Logout of Azure CLI
-          - name: logout
-            run: az logout
-
 
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
@@ -119,13 +114,6 @@ jobs:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
-
-            # Login via the Azure Module
-          - name: 'Login via Azure Module'
-            uses: azure/login@v1
-            with:
-                creds: ${{secrets.AZURE_CREDENTIALS}}
-                enable-AzPSSession: true
     
             # Retrieve Secrets from Azure Secret Vault
     
@@ -165,5 +153,5 @@ jobs:
                 package: './DNetBotFunctions'
             
             # Logout of Azure CLI
-          - name: logout
+          - name: Logout of Azure
             run: az logout
