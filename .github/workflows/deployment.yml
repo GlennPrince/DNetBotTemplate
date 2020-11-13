@@ -26,7 +26,7 @@ env:
     DNETBOT_NAME: 'DNetBot'                                                         # DNet Bot Naming Prefix for Resources
     DOTNET_VERSION: '3.1.x'                                                         # SDK Version to use
     AZURE_LOCATION: 'us-east'                                                       # Resource Location
-    AZURE_RG: 'RG-DnetBot'                                                          # Resource Group Name to use
+    AZURE_RG: 'RG-DNet-Bot'                                                          # Resource Group Name to use
     AZURE_WEB_SKU: 'F1'                                                             # Size of the WebApp to deploy
 
 jobs:
