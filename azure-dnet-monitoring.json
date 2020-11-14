@@ -2,14 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "appInsightsName": {
-          "type": "string",
-          "defaultValue": "[concat('insights-', uniqueString(resourceGroup().id))]",
-          "metadata": {
-              "description": "Application Insights Name."
-          },
-          "minLength": 2
+    "appInsightsName": {
+      "type": "string",
+      "defaultValue": "[concat(uniqueString(resourceGroup().id), '-insights')]",
+      "metadata": {
+        "description": "Application Insights Name."
       },
+      "minLength": 2
+    },
       "location": {
           "type": "string",
           "defaultValue": "[resourceGroup().location]",
@@ -18,20 +18,18 @@
           }
       }
   },
-  "variables": {
-      "applicationInsightsName": "[parameters('appInsightsName')]"
-  },
+  "variables": {},
   "resources": [
     {
       "type": "microsoft.insights/components",
       "apiVersion": "2020-02-02-preview",
-      "name": "[variables('applicationInsightsName')]",
+      "name": "[parameters('appInsightsName')]",
       "location": "[parameters('location')]",
       "tags": {
-        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('appInsightsName')))]": "Resource"
       },
       "properties": {
-        "ApplicationId": "[variables('applicationInsightsName')]",
+        "ApplicationId": "[parameters('appInsightsName')]",
         "Request_Source": "AzureTemplate"
       }
     }

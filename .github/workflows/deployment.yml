@@ -64,7 +64,7 @@ jobs:
                 template: ./azure-dnet-monitoring.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
-                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
+                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
 
             # Deploy EventGrid Resources
           - name: 'Deploy Azure EventGrid Components'
@@ -75,7 +75,7 @@ jobs:
                 template: ./azure-dnet-eventgrid.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
-                    eventgGridDomainName=${{ env.DNETBOT_NAME }}_EventGridDomain
+                    eventGridName=${{ env.DNETBOT_NAME }}-eventgrid-domain
 
             # Deploy Function Resources
           - name: 'Deploy Azure Function Components'
@@ -85,10 +85,10 @@ jobs:
                 resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-dnet-functions.json
                 parameters:
-                    funcAppName=${{ env.DNETBOT_NAME }}_Funcs
+                    funcAppName=${{ env.DNETBOT_NAME }}-funcs
                     location=${{ env.AZURE_LOCATION }}
                     runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
+                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
                     appStorageName=${{ env.DNETBOT_NAME }}storage
 
             # Deploy WebApp Resources
@@ -99,11 +99,11 @@ jobs:
                 resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-dnet-webapp.json
                 parameters:
-                    webAppName=${{ env.DNETBOT_NAME }}_Proxy
+                    webAppName=${{ env.DNETBOT_NAME }}-proxy
                     location=${{ env.AZURE_LOCATION }}
                     sku=${{ env.AZURE_WEB_SKU }}
                     runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
+                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
                     appStorageName=${{ env.DNETBOT_NAME }}storage
 
     build-and-deploy:
@@ -141,7 +141,7 @@ jobs:
           - name: 'Deploy DnetBot WebApp'
             uses: azure/webapps-deploy@v2
             with:
-                app-name: ${{ env.DNETBOT_NAME }}_Proxy
+                app-name: ${{ env.DNETBOT_NAME }}-proxy
                 package: './DNetBot'
 
             # Deploy the DNetBot Functions
@@ -149,7 +149,7 @@ jobs:
             uses: Azure/functions-action@v1
             id: fa
             with:
-                app-name: ${{ env.DNETBOT_NAME }}_Funcs
+                app-name: ${{ env.DNETBOT_NAME }}-funcs
                 package: './DNetBotFunctions'
 
     eventgrid-topic-creation:
@@ -164,7 +164,7 @@ jobs:
           - name: Create Event Grid Topics
             uses: azure/CLI@v1
             env:
-                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}_EventGridDomain
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
             with:
                 azcliversion: 2.0.72
                 inlineScript: |
@@ -181,10 +181,10 @@ jobs:
           - name: Subscribe Proxy to Topics
             uses: azure/CLI@v1
             env:
-                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}_Proxy_ReturnMessage
-                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}_EventGridDomain
-                ENDPOINT_ADDRESS: ${{ env.DNETBOT_NAME }}_Proxy.azurewebsites.net/api/EventGrid/ReturnMessage
-                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}_EventGridDomain/topics/returnmessage
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-proxy-returnmessage
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: ${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
             with:
                 azcliversion: 2.0.72
                 inlineScript: |
@@ -194,10 +194,10 @@ jobs:
           - name: Subscribe Proxy to Topics
             uses: azure/CLI@v1
             env:
-                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}_Function_Messages_New
-                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}_EventGridDomain
-                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}_Funcs/functions/NewMessageEvent
-                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}_EventGridDomain/topics/messages
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-funcs/functions/NewMessageEvent
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
             with:
                 azcliversion: 2.0.72
                 inlineScript: |

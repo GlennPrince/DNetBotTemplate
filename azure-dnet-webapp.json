@@ -4,7 +4,7 @@
   "parameters": {
     "webAppName": {
       "type": "string",
-      "defaultValue": "[concat('ASPNET-', uniqueString(resourceGroup().id))]",
+      "defaultValue": "[concat(uniqueString(resourceGroup().id), '-webapp')]",
       "metadata": {
         "description": "That name is the name of our application. It has to be unique. Type a name followed by your resource group name. (<name>-<resourceGroupName>)"
       }
@@ -47,13 +47,11 @@
   },
   "variables": {
     "alwaysOn": false,
-    "sku": "Free",
-    "skuCode": "F1",
     "workerSize": "0",
     "workerSizeId": 0,
     "numberOfWorkers": "1",
     "currentStack": "dotnet",
-    "hostingPlanName": "[concat(parameters('webAppName'), '_Hosting')]"
+    "hostingPlanName": "[concat(parameters('webAppName'), '-hosting')]"
   },
   "resources": [
     {
@@ -108,7 +106,7 @@
           "metadata": [
             {
               "name": "CURRENT_STACK",
-              "value": "[ parameters('runtime')]"
+              "value": "[parameters('runtime')]"
             }
           ],
           "alwaysOn": "[variables('alwaysOn')]"
@@ -129,7 +127,7 @@
         "numberOfWorkers": "[variables('numberOfWorkers')]"
       },
       "sku": {
-        "Tier": "[variables('sku')]"
+        "Tier": "[parameters('sku')]"
       }
     }
   ]
