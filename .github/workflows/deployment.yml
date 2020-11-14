@@ -53,7 +53,7 @@ jobs:
                 template: ./azure-dnet-storage.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
-                    appStorageName=${{ env.DNETBOT_NAME }}storage
+                    storageAccountName=${{ env.DNETBOT_NAME }}storage
 
             # Deploy Monitoring Resources
           - name: 'Deploy Azure Monitoring Components'
