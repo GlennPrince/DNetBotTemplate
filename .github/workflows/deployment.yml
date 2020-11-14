@@ -27,7 +27,7 @@ env:
     DOTNET_VERSION: '3.1.x'                                                         # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
-    AZURE_WEB_SKU: 'F1'                                                             # Size of the WebApp to deploy
+    AZURE_WEB_SKU: 'B1'                                                             # Size of the WebApp to deploy
 
 jobs:
     deploy-azure-infrastructure:
