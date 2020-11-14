@@ -36,7 +36,7 @@ jobs:
         steps:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
-            uses: actions/checkout@main
+            uses: actions/checkout@development
 
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
