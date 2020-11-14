@@ -113,9 +113,7 @@ jobs:
         steps:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
-            uses: actions/checkout@main
-    
-            # Retrieve Secrets from Azure Secret Vault
+            uses: actions/checkout@main0
     
             # Setup Dotnet Core
           - name: 'Configure DotNet Core'
@@ -130,6 +128,12 @@ jobs:
                 dotnet build --configuration Release
                 dotnet publish -c Release -o './DNetBot-Release'
                 dotnet publish -c Release -o './DNetBotFunctions-Release'
+
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
 
             # Deploy the DNetBot WebApp
           - name: 'Deploy DnetBot WebApp'
@@ -146,11 +150,22 @@ jobs:
                 app-name: ${{ env.DNETBOT_NAME }}-funcs
                 package: './DNetBotFunctions-Release'
 
+            # Logout of Azure CLI
+          - name: Logout of Azure
+            run: az logout
+
     eventgrid-topic-creation:
         name: 'Create EventGrid Topics'
         runs-on: ubuntu-latest
         needs: [deploy-azure-infrastructure, build-and-deploy]
         steps:
+
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
@@ -196,12 +211,7 @@ jobs:
                 azcliversion: 2.0.72
                 inlineScript: |
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction
-
-    cleanup-and-logout:
-        name: 'Cleanup and Logout'
-        runs-on: ubuntu-latest
-        needs: [deploy-azure-infrastructure, build-and-deploy, eventgrid-topic-creation]
-        steps:
+            
             # Logout of Azure CLI
           - name: Logout of Azure
             run: az logout
