@@ -24,7 +24,7 @@ on:
 # deploying to. You also need to set the secrets above.
 env:
     DNETBOT_NAME: 'dnetbot'                                                         # DNet Bot Naming Prefix for Resources (Lowercase, No Spaces or Special Characters)
-    DOTNET_VERSION: '3.1.403'                                                         # SDK Version to use
+    DOTNET_VERSION: '3.1.403'                                                       # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
     AZURE_WEB_SKU: 'B1'                                                             # Size of the WebApp to deploy
@@ -124,25 +124,19 @@ jobs:
                 dotnet-version: ${{ env.DOTNET_VERSION }} 
 
             # Run DotNet Build and Publish for DNetBot
-          - name: 'Dotnet build and publish for WebApp'
+          - name: 'Dotnet build and publish'
             run: |
                 dotnet restore
-                dotnet build DNetBot --configuration Release
-                dotnet publish -c Release -o './DNetBot'
-
-            # Run DotNet Build and Publish for DNetBotFunctions
-          - name: 'Sotnet build and publish for Functions'
-            run: |
-                dotnet restore
-                dotnet build DNetBotFunctions --configuration Release
-                dotnet publish -c Release -o './DNetBotFunctions'
+                dotnet build --configuration Release
+                dotnet publish -c Release -o './DNetBot-Release'
+                dotnet publish -c Release -o './DNetBotFunctions-Release'
 
             # Deploy the DNetBot WebApp
           - name: 'Deploy DnetBot WebApp'
             uses: azure/webapps-deploy@v2
             with:
                 app-name: ${{ env.DNETBOT_NAME }}-proxy
-                package: './DNetBot'
+                package: './DNetBot-Release'
 
             # Deploy the DNetBot Functions
           - name: 'Run Azure Functions Action'
@@ -150,7 +144,7 @@ jobs:
             id: fa
             with:
                 app-name: ${{ env.DNETBOT_NAME }}-funcs
-                package: './DNetBotFunctions'
+                package: './DNetBotFunctions-Release'
 
     eventgrid-topic-creation:
         name: 'Create EventGrid Topics'
