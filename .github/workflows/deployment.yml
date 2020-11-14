@@ -126,8 +126,8 @@ jobs:
             run: |
                 dotnet restore
                 dotnet build --configuration Release
-                dotnet publish -c Release -o './DNetBot-Release'
-                dotnet publish -c Release -o './DNetBotFunctions-Release'
+                dotnet publish DNetBot -c Release -o './DNetBot-Release'
+                dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
 
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
