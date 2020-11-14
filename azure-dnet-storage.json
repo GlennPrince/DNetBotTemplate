@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "[concat('storage-', uniqueString(resourceGroup().id))]",
       "metadata": {
-        "description": "Application Insights Name."
+        "description": "Storage Account Name"
       },
       "minLength": 2
     },

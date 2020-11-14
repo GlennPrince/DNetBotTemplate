@@ -4,7 +4,7 @@
     "parameters": {
         "eventGridName": {
           "type": "String",
-          "defaultValue": "[concat('eventgrid-', uniqueString(resourceGroup().id))]",
+          "defaultValue": "[concat('eventgrid-', uniqueString(resourceGroup().id))]"
         },
         "location": {
         "type": "string",

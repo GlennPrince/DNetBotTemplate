@@ -62,7 +62,6 @@
       "type": "Microsoft.Web/sites",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Insights/components/', parameters('appInsightsName'))]",
         "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
       "properties": {

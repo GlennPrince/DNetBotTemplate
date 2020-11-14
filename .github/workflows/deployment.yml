@@ -23,7 +23,7 @@ on:
 # These Variables Change based on the Environment you are 
 # deploying to. You also need to set the secrets above.
 env:
-    DNETBOT_NAME: 'DNetBot'                                                         # DNet Bot Naming Prefix for Resources
+    DNETBOT_NAME: 'DNetBot'                                                         # DNet Bot Naming Prefix for Resources (No Spaces or Special Characters)
     DOTNET_VERSION: '3.1.x'                                                         # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
@@ -53,7 +53,7 @@ jobs:
                 template: ./azure-dnet-storage.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
-                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
+                    appStorageName=${{ env.DNETBOT_NAME }}Storage
 
             # Deploy Monitoring Resources
           - name: 'Deploy Azure Monitoring Components'
@@ -151,7 +151,61 @@ jobs:
             with:
                 app-name: ${{ env.DNETBOT_NAME }}_Funcs
                 package: './DNetBotFunctions'
+
+    eventgrid-topic-creation:
+        name: 'Create EventGrid Topics'
+        runs-on: ubuntu-latest
+        steps:
+            # Check out the source code from the main branch
+          - name: 'Check Out Main'
+            uses: actions/checkout@main
+            # Creates all the topics in the domain to support bot events
+          - name: Create Event Grid Topics
+            uses: azure/CLI@v1
+            env:
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}_EventGridDomain
+            with:
+                azcliversion: 2.0.72
+                inlineScript: |
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name channel
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name guild
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name messages
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name role
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage
             
+            # Proxy Subscribe to the Return Topic
+          - name: Subscribe Proxy to Topics
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}_Proxy_ReturnMessage
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}_EventGridDomain
+                ENDPOINT_ADDRESS: ${{ env.DNETBOT_NAME }}_Proxy.azurewebsites.net/api/EventGrid/ReturnMessage
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}_EventGridDomain/topics/returnmessage
+            with:
+                azcliversion: 2.0.72
+                inlineScript: |
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS
+
+            # Function Subscribe to the Message Topic
+          - name: Subscribe Proxy to Topics
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}_Function_Messages_New
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}_EventGridDomain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}_Funcs/functions/NewMessageEvent
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}_EventGridDomain/topics/messages
+            with:
+                azcliversion: 2.0.72
+                inlineScript: |
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction
+
+    cleanup-and-logout:
+        name: 'Cleanup and Logout'
+        runs-on: ubuntu-latest
+        steps:
             # Logout of Azure CLI
           - name: Logout of Azure
             run: az logout
