@@ -23,7 +23,7 @@ on:
 # These Variables Change based on the Environment you are 
 # deploying to. You also need to set the secrets above.
 env:
-    DNETBOT_NAME: 'DNetBot'                                                         # DNet Bot Naming Prefix for Resources (No Spaces or Special Characters)
+    DNETBOT_NAME: 'dnetbpt'                                                         # DNet Bot Naming Prefix for Resources (Lowercase, No Spaces or Special Characters)
     DOTNET_VERSION: '3.1.x'                                                         # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
@@ -53,7 +53,7 @@ jobs:
                 template: ./azure-dnet-storage.json
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
-                    appStorageName=${{ env.DNETBOT_NAME }}Storage
+                    appStorageName=${{ env.DNETBOT_NAME }}storage
 
             # Deploy Monitoring Resources
           - name: 'Deploy Azure Monitoring Components'
@@ -89,7 +89,7 @@ jobs:
                     location=${{ env.AZURE_LOCATION }}
                     runtime=dotnet
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
-                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
+                    appStorageName=${{ env.DNETBOT_NAME }}storage
 
             # Deploy WebApp Resources
           - name: 'Deploy Azure WebApp Components'
@@ -104,7 +104,7 @@ jobs:
                     sku=${{ env.AZURE_WEB_SKU }}
                     runtime=dotnet
                     appInsightsName=${{ env.DNETBOT_NAME }}_Insights
-                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
+                    appStorageName=${{ env.DNETBOT_NAME }}storage
 
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
