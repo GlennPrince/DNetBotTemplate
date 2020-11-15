@@ -83,7 +83,7 @@ jobs:
     eventgrid-topic-creation:
         name: 'Create EventGrid Topics'
         runs-on: ubuntu-latest
-        needs: [deploy-azure-infrastructure, build-and-deploy]
+        needs: build-and-deploy
         steps:
 
           - name: Login via Azure Module                                              # Login via the Azure Module
