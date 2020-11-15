@@ -10,11 +10,11 @@
 # AZURE_CREDENTIALS - The Service Principle details for Azure
 # SUBSCRIPTION_ID - Your Subscription ID
 
-name: DeployDNetBot
+name: TestAndTroubleshootFlow
 
 on:
     push:
-        branches: [ main ]
+        branches: [ main, development ]
     pull_request:
         branches: [ main ]
 
@@ -30,82 +30,6 @@ env:
     AZURE_WEB_SKU: 'B1'                                                             # Size of the WebApp to deploy
 
 jobs:
-    deploy-azure-infrastructure:
-        name: 'Deploy Azure Infrastructure'
-        runs-on: ubuntu-latest
-        steps:
-            # Check out the source code from the main branch
-          - name: 'Check Out Main'
-            uses: actions/checkout@main
-
-          - name: Login via Azure Module                                              # Login via the Azure Module
-            uses: azure/login@v1
-            with:
-                creds: ${{secrets.AZURE_CREDENTIALS}}
-                enable-AzPSSession: true
-
-            # Deploy Storage Components First
-          - name: 'Deploy Azure Storage Components'
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-dnet-storage.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    storageAccountName=${{ env.DNETBOT_NAME }}storage
-
-            # Deploy Monitoring Resources
-          - name: 'Deploy Azure Monitoring Components'
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-dnet-monitoring.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
-
-            # Deploy EventGrid Resources
-          - name: 'Deploy Azure EventGrid Components'
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-dnet-eventgrid.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    eventGridName=${{ env.DNETBOT_NAME }}-eventgrid-domain
-
-            # Deploy Function Resources
-          - name: 'Deploy Azure Function Components'
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-dnet-functions.json
-                parameters:
-                    funcAppName=${{ env.DNETBOT_NAME }}-funcs
-                    location=${{ env.AZURE_LOCATION }}
-                    runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
-                    appStorageName=${{ env.DNETBOT_NAME }}storage
-
-            # Deploy WebApp Resources
-          - name: 'Deploy Azure WebApp Components'
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-dnet-webapp.json
-                parameters:
-                    webAppName=${{ env.DNETBOT_NAME }}-proxy
-                    location=${{ env.AZURE_LOCATION }}
-                    sku=${{ env.AZURE_WEB_SKU }}
-                    runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
-                    appStorageName=${{ env.DNETBOT_NAME }}storage
-
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
         needs: deploy-azure-infrastructure
@@ -128,6 +52,7 @@ jobs:
                 dotnet build --configuration Release
                 dotnet publish DNetBot -c Release -o './DNetBot-Release'
                 dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
+                zip -r dnet-func-release.zip ./DNetBotFunctions-Release
 
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
@@ -136,29 +61,21 @@ jobs:
                 enable-AzPSSession: true
 
             # Deploy the DNetBot WebApp
-          - name: 'Deploy DnetBot WebApp'
-            uses: azure/webapps-deploy@v2
-            with:
-                app-name: ${{ env.DNETBOT_NAME }}-proxy
-                package: './DNetBot-Release'
+          #- name: 'Deploy DnetBot WebApp'
+            #uses: azure/webapps-deploy@v2
+            #with:
+            #    app-name: ${{ env.DNETBOT_NAME }}-proxy
+            #    package: './DNetBot-Release'
 
-          - name: Get the Function Publishing Profile
+            # Deploy the DNetBot Functions
+          - name: 'Run Azure Functions Deployment'
             uses: azure/CLI@v1
             env:
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                    az functionapp deployment list-publishing-profiles --name ${{ env.FUNCTION_NAME }} --resource-group ${{ env.AZURE_RG }} --xml >> ::add-mask::$FUNC_DEPLOY
-
-            # Deploy the DNetBot Functions
-          - name: 'Run Azure Functions Action'
-            uses: Azure/functions-action@v1
-            id: fa
-            with:
-                app-name: ${{ env.DNETBOT_NAME }}-funcs
-                package: './DNetBotFunctions-Release'
-                publish-profile: ${{ env.FUNC_DEPLOY }}
+                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-funcs --src dnet-func-release.zip
 
             # Logout of Azure CLI
           - name: Logout of Azure
