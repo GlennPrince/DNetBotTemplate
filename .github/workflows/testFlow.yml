@@ -32,7 +32,6 @@ env:
 jobs:
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
-        needs: deploy-azure-infrastructure
         runs-on: ubuntu-latest
         steps:
             # Check out the source code from the main branch
