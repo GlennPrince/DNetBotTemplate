@@ -147,7 +147,7 @@ jobs:
             env:
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
             with:
-                azcliversion: 2.0.72
+                azcliversion: 2.14.2
                 inlineScript: |
                     az functionapp deployment list-publishing-profiles --name ${{ env.FUNCTION_NAME }} --resource-group ${{ env.AZURE_RG }} --xml >> ./publish.xml
 
@@ -185,7 +185,7 @@ jobs:
             env:
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
             with:
-                azcliversion: 2.0.72
+                azcliversion: 2.14.2
                 inlineScript: |
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot
