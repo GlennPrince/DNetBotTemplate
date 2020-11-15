@@ -109,7 +109,7 @@ jobs:
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
         needs: deploy-azure-infrastructure
-        runs-on: windows-latest
+        runs-on: ubuntu-latest
         steps:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
