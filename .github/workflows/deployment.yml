@@ -14,7 +14,7 @@ name: DeployDNetBot
 
 on:
     push:
-        branches: [ main ]
+        branches: [ main, development ]
     pull_request:
         branches: [ main ]
 
@@ -128,6 +128,7 @@ jobs:
                 dotnet build --configuration Release
                 dotnet publish DNetBot -c Release -o './DNetBot-Release'
                 dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
+                zip -r dnet-func-release.zip ./DNetBotFunctions-Release/*
 
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
@@ -142,23 +143,15 @@ jobs:
                 app-name: ${{ env.DNETBOT_NAME }}-proxy
                 package: './DNetBot-Release'
 
-          - name: Get the Function Publishing Profile
+            # Deploy the DNetBot Functions
+          - name: 'Run Azure Functions Deployment'
             uses: azure/CLI@v1
             env:
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                    az functionapp deployment list-publishing-profiles --name ${{ env.FUNCTION_NAME }} --resource-group ${{ env.AZURE_RG }} --xml >> ::add-mask::$FUNC_DEPLOY
-
-            # Deploy the DNetBot Functions
-          - name: 'Run Azure Functions Action'
-            uses: Azure/functions-action@v1
-            id: fa
-            with:
-                app-name: ${{ env.DNETBOT_NAME }}-funcs
-                package: './DNetBotFunctions-Release'
-                publish-profile: ${{ env.FUNC_DEPLOY }}
+                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-funcs --src dnet-func-release.zip
 
             # Logout of Azure CLI
           - name: Logout of Azure
