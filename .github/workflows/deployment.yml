@@ -149,7 +149,7 @@ jobs:
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                    az functionapp deployment list-publishing-profiles --name ${{ env.FUNCTION_NAME }} --resource-group ${{ env.AZURE_RG }} --xml >> ./publish.xml
+                    az functionapp deployment list-publishing-profiles --name ${{ env.FUNCTION_NAME }} --resource-group ${{ env.AZURE_RG }} --xml >> ::add-mask::$FUNC_DEPLOY
 
             # Deploy the DNetBot Functions
           - name: 'Run Azure Functions Action'
@@ -158,7 +158,7 @@ jobs:
             with:
                 app-name: ${{ env.DNETBOT_NAME }}-funcs
                 package: './DNetBotFunctions-Release'
-                publish-profile: ./publish.xml
+                publish-profile: ${{ env.FUNC_DEPLOY }}
 
             # Logout of Azure CLI
           - name: Logout of Azure
