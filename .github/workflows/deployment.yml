@@ -110,7 +110,7 @@ jobs:
           - name: 'Add Environment Variables'
             uses: azure/CLI@v1
             env:
-                EVENTGRID_NAME: {{ env.DNETBOT_NAME }}-eventgrid-domain
+                EVENTGRID_NAME: ${{ env.DNETBOT_NAME }}-eventgrid-domain
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
                 WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
             with:
