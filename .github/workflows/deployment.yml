@@ -128,7 +128,6 @@ jobs:
                 dotnet build --configuration Release
                 dotnet publish DNetBot -c Release -o './DNetBot-Release'
                 dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
-                zip -r -j dnet-func-release.zip ./DNetBotFunctions-Release/*
 
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
@@ -151,6 +150,8 @@ jobs:
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
+                    cd DNetBotFunctions-Release
+                    zip -r -j ../dnet-func-release.zip *
                     az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-funcs --src dnet-func-release.zip
 
             # Logout of Azure CLI
