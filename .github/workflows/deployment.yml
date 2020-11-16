@@ -113,11 +113,13 @@ jobs:
                 EVENTGRID_NAME: ${{ env.DNETBOT_NAME }}-eventgrid-domain
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
                 WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
+                EVENTGRID_KEY: key
+                EVENTGRID_ENDPOINT: endpoint
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                    az eventgrid domain key list --name {{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 > $EVENTGRID_KEY
-                    az eventgrid domain show --name {{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint > $EVENTGRID_ENDPOINT
+                    az eventgrid domain key list --name {{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 >> $EVENTGRID_KEY
+                    az eventgrid domain show --name {{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint >> $EVENTGRID_ENDPOINT
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings ::add-mask::EventGridDomainEndPoint=${{ env.EVENTGRID_ENDPOINT }}
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings ::add-mask::EventGridDomainAccessKey=${{ env.EVENTGRID_KEY }}
                     az functionapp config appsettings set --group ${{ env.AZURE_RG }} --name ${{ env.WEBAPP_NAME }} --settings ::add-mask::EventGridDomain=${{ env.EVENTGRID_ENDPOINT }}
