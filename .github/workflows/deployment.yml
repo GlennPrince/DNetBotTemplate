@@ -151,7 +151,7 @@ jobs:
                 azcliversion: 2.14.2
                 inlineScript: |
                     cd DNetBotFunctions-Release
-                    zip -r -j ../dnet-func-release.zip *
+                    zip -r ../dnet-func-release.zip *
                     cd ..
                     az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-funcs --src dnet-func-release.zip
 
