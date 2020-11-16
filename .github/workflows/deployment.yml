@@ -128,7 +128,7 @@ jobs:
                 dotnet build --configuration Release
                 dotnet publish DNetBot -c Release -o './DNetBot-Release'
                 dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
-                zip -r dnet-func-release.zip ./DNetBotFunctions-Release/*
+                zip -r -j dnet-func-release.zip ./DNetBotFunctions-Release/*
 
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
