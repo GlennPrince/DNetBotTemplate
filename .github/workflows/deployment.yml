@@ -41,7 +41,7 @@ jobs:
           - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
             with:
-                creds: ${{secrets.AZURE_CREDENTIALS}}
+                creds: ${{ secrets.AZURE_CREDENTIALS }}
                 enable-AzPSSession: true
 
             # Deploy Storage Components First
