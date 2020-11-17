@@ -116,9 +116,8 @@ jobs:
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                    az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 >> $EVENTGRID_KEY
-                    echo $EVENTGRID_KEY
-                    az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint >> $EVENTGRID_ENDPOINT
+                    $EVENTGRID_KEY = az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 -o tsv
+                    $EVENTGRID_ENDPOINT = az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint -o tsv
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainEndPoint=${{ env.EVENTGRID_ENDPOINT }}
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainAccessKey=${{ env.EVENTGRID_KEY }}
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=${{ env.EVENTGRID_ENDPOINT }}
