@@ -118,10 +118,10 @@ jobs:
                 inlineScript: |
                     az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 >> $EVENTGRID_KEY
                     az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint >> $EVENTGRID_ENDPOINT
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainEndPoint=$EVENTGRID_ENDPOINT
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainAccessKey=$EVENTGRID_KEY
-                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT
-                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainEndPoint=${{ env.$EVENTGRID_ENDPOINT }}
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainAccessKey=${{ env.$EVENTGRID_KEY }}
+                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=${{ env.$EVENTGRID_ENDPOINT }}
+                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=${{ env.$EVENTGRID_KEY }}
 
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
