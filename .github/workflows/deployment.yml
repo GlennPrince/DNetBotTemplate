@@ -113,8 +113,6 @@ jobs:
                 EVENTGRID_NAME: ${{ env.DNETBOT_NAME }}-eventgrid-domain
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
                 WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
-                EVENTGRID_KEY: key
-                EVENTGRID_ENDPOINT: endpoint
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
