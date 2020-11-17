@@ -115,8 +115,9 @@ jobs:
                 WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
             with:
                 azcliversion: 2.14.2
-                inlineScript: |
+                run: |
                     az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 >> $EVENTGRID_KEY
+                    echo $EVENTGRID_KEY
                     az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint >> $EVENTGRID_ENDPOINT
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainEndPoint=${{ env.$EVENTGRID_ENDPOINT }}
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainAccessKey=${{ env.$EVENTGRID_KEY }}
