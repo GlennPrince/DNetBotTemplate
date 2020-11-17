@@ -172,7 +172,8 @@ namespace DNetUtils.Entities
             ApplicationId = guild.ApplicationId;
             OwnerId = guild.OwnerId;
             DefaultChannelId = guild.DefaultChannel.Id;
-            EmbedChannelId = guild.EmbedChannel.Id;
+            if(guild.EmbedChannel != null)
+                EmbedChannelId = guild.EmbedChannel.Id;
             EveryoneId = guild.EveryoneRole.Id;
             SystemChannelId = guild.SystemChannel.Id;
 

@@ -120,6 +120,7 @@ jobs:
                     EVENTGRID_ENDPOINT=$(az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint -o tsv)
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainEndPoint=$EVENTGRID_ENDPOINT
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainAccessKey=$EVENTGRID_KEY
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY
 
