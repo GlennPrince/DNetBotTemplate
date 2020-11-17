@@ -23,7 +23,7 @@ on:
 # These Variables Change based on the Environment you are 
 # deploying to. You also need to set the secrets above.
 env:
-    DNETBOT_NAME: 'dnetbot'                                                         # DNet Bot Naming Prefix for Resources (Lowercase, No Spaces or Special Characters)
+    DNETBOT_NAME: 'discordnetbot'                                                   # DNet Bot Naming Prefix for Resources (Lowercase, No Spaces or Special Characters)
     DOTNET_VERSION: '3.1.403'                                                       # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
