@@ -132,6 +132,8 @@ jobs:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
+            with:
+                ref: development
     
             # Setup Dotnet Core
           - name: 'Configure DotNet Core'
@@ -192,6 +194,9 @@ jobs:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
+            with:
+                ref: development
+
             # Creates all the topics in the domain to support bot events
           - name: Create Event Grid Topics
             uses: azure/CLI@v1
