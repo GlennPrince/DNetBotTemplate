@@ -46,7 +46,7 @@
     }
   },
   "variables": {
-    "alwaysOn": false,
+    "alwaysOn": true,
     "workerSize": "0",
     "workerSizeId": 0,
     "numberOfWorkers": "1",
@@ -62,8 +62,12 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
+      "kind": "app,linux",
       "properties": {
         "name": "[parameters('webAppName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "clientAffinityEnabled": true,
+        "httpsOnly": true,
         "siteConfig": {
           "appSettings": [
             {
@@ -77,30 +81,6 @@
             {
               "name": "XDT_MicrosoftApplicationInsights_Mode",
               "value": "default"
-            },
-            {
-              "name": "DiagnosticServices_EXTENSION_VERSION",
-              "value": "disabled"
-            },
-            {
-              "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
-              "value": "disabled"
-            },
-            {
-              "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
-              "value": "disabled"
-            },
-            {
-              "name": "InstrumentationEngine_EXTENSION_VERSION",
-              "value": "disabled"
-            },
-            {
-              "name": "SnapshotDebugger_EXTENSION_VERSION",
-              "value": "disabled"
-            },
-            {
-              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
-              "value": "disabled"
             }
           ],
           "metadata": [
@@ -110,9 +90,7 @@
             }
           ],
           "alwaysOn": "[variables('alwaysOn')]"
-        },
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-        "clientAffinityEnabled": true
+        }
       }
     },
     {
@@ -120,6 +98,7 @@
       "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('location')]",
+      "kind": "linux",
       "properties": {
         "name": "[variables('hostingPlanName')]",
         "workerSize": "[variables('workerSize')]",
