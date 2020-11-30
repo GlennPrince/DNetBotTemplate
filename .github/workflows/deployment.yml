@@ -27,7 +27,7 @@ env:
     DOTNET_VERSION: '3.1.403'                                                       # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
-    AZURE_WEB_SKU: 'B1'                                                             # Size of the WebApp to deploy
+    AZURE_WEB_SKU: 'S1'                                                             # Size of the WebApp to deploy
 
 jobs:
     deploy-azure-infrastructure:
@@ -102,9 +102,7 @@ jobs:
                     webAppName=${{ env.DNETBOT_NAME }}-proxy
                     location=${{ env.AZURE_LOCATION }}
                     sku=${{ env.AZURE_WEB_SKU }}
-                    runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
-                    appStorageName=${{ env.DNETBOT_NAME }}storage
+                    linuxFxVersion=DOTNETCORE|3.1
 
             # Add WebApp and Function Environment Variables
           - name: 'Add Environment Variables'

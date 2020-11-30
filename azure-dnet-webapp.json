@@ -4,9 +4,24 @@
   "parameters": {
     "webAppName": {
       "type": "string",
-      "defaultValue": "[concat(uniqueString(resourceGroup().id), '-webapp')]",
+      "defaultValue": "DNetBotProxy",
       "metadata": {
-        "description": "That name is the name of our application. It has to be unique. Type a name followed by your resource group name. (<name>-<resourceGroupName>)"
+        "description": "Base name of the resource such as web app name and app service plan "
+      },
+      "minLength": 2
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "S1",
+      "metadata": {
+        "description": "The SKU of App Service Plan "
+      }
+    },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "DOTNETCORE|3.1",
+      "metadata": {
+        "description": "The Runtime stack of current web app"
       }
     },
     "location": {
@@ -15,111 +30,40 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    },
-    "sku": {
-      "type": "string",
-      "defaultValue": "F1",
-      "metadata": {
-        "description": "Sizing for the WebApp Instance."
-      }
-    },
-    "appInsightsName": {
-      "type": "string",
-      "defaultValue": "F1",
-      "metadata": {
-        "description": "Sizing for the WebApp Instance."
-      }
-    },
-    "appStorageName": {
-      "type": "string",
-      "defaultValue": "F1",
-      "metadata": {
-        "description": "Sizing for the WebApp Instance."
-      }
-    },
-    "runtime": {
-      "type": "string",
-      "defaultValue": "dotnet",
-      "metadata": {
-        "description": "Runtime / Stack"
-      }
     }
   },
   "variables": {
-    "alwaysOn": true,
-    "workerSize": "0",
-    "workerSizeId": 0,
-    "numberOfWorkers": "1",
-    "currentStack": "dotnet",
-    "hostingPlanName": "[concat(parameters('webAppName'), '-hosting')]"
+    "webAppPortalName": "[concat(parameters('webAppName'), '-webapp')]",
+    "appServicePlanName": "[concat('AppServicePlan-', parameters('webAppName'))]"
   },
   "resources": [
     {
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2018-11-01",
-      "name": "[parameters('webAppName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
-      ],
-      "kind": "app,linux",
-      "properties": {
-        "name": "[parameters('webAppName')]",
-        "enabled": true,
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-        "reserved": true,
-        "isXenon": false,
-        "hyperV": false,
-        "alwaysOn": "[variables('alwaysOn')]",
-        "clientAffinityEnabled": true,
-        "clientCertEnabled": false,
-        "hostNamesDisabled": false,
-        "containerSize": 0,
-        "dailyMemoryTimeQuota": 0,
-        "httpsOnly": true,
-        "redundancyMode": "None",
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', parameters('appInsightsName')), '2018-05-01-preview').InstrumentationKey]"
-            },
-            {
-              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
-              "value": "~2"
-            },
-            {
-              "name": "XDT_MicrosoftApplicationInsights_Mode",
-              "value": "default"
-            }
-          ],
-          "metadata": [
-            {
-              "name": "CURRENT_STACK",
-              "value": "[parameters('runtime')]"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "apiVersion": "2020-06-01",
-      "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('appServicePlanName')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "[parameters('sku')]"
       },
       "kind": "linux",
       "properties": {
-        "perSiteScaling": false,
-        "maximumElasticWorkerCount": 1,
-        "isSpot": false,
-        "reserved": true,
-        "isXenon": false,
-        "hyperV": false,
-        "targetWorkerCount": 0,
-        "targetWorkerSizeId": 0
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('webAppPortalName')]",
+      "location": "[parameters('location')]",
+      "kind": "app",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[parameters('linuxFxVersion')]"
+        }
       }
     }
   ]
