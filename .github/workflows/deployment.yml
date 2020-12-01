@@ -85,11 +85,10 @@ jobs:
                 resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-dnet-functions.json
                 parameters:
-                    funcAppName=${{ env.DNETBOT_NAME }}-funcs
+                    name=${{ env.DNETBOT_NAME }}-function
                     location=${{ env.AZURE_LOCATION }}
-                    runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
-                    appStorageName=${{ env.DNETBOT_NAME }}storage
+                    storageAccountName=${{ env.DNETBOT_NAME }}storage
+                    use32BitWorkerProcess=false
 
             # Deploy WebApp Resources
           - name: 'Deploy Azure WebApp Components'
@@ -99,10 +98,8 @@ jobs:
                 resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-dnet-webapp.json
                 parameters:
-                    subscriptionId=${{ secrets.SUBSCRIPTION_ID }}
                     name=${{ env.DNETBOT_NAME }}-proxy
                     location=${{ env.AZURE_LOCATION }}
-                    resourceGroup=${{ env.AZURE_RG }}
                     alwaysOn=true
                     sku=${{ env.AZURE_WEB_SKU }}
                     linuxFxVersion=DOTNETCORE|3.1

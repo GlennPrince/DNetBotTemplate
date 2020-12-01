@@ -2,9 +2,6 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subscriptionId": {
-      "type": "string"
-    },
     "name": {
       "type": "string"
     },
@@ -74,9 +71,6 @@
         "brazilsoutheast"
       ]
     },
-    "resourceGroup": {
-      "type": "string"
-    },
     "alwaysOn": {
       "type": "bool"
     },
@@ -118,7 +112,7 @@
           "linuxFxVersion": "[parameters('linuxFxVersion')]",
           "alwaysOn": "[parameters('alwaysOn')]"
         },
-        "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', parameters('resourceGroup'), '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "clientAffinityEnabled": false
       }
     },
