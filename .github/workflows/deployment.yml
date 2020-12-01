@@ -119,14 +119,13 @@ jobs:
                 inlineScript: |
                     echo "::add-mask::$EVENTGRID_ENDPOINT"
                     echo "::add-mask::$EVENTGRID_KEY"
-                    echo "::add-mask::${{ secrets.DISCORD_BOT_TOKEN }}
                     EVENTGRID_KEY=$(az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 -o tsv)
                     EVENTGRID_ENDPOINT=$(az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint -o tsv)
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainEndPoint=$EVENTGRID_ENDPOINT
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainAccessKey=$EVENTGRID_KEY
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT
-                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainEndPoint=$EVENTGRID_ENDPOINT --output none
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainAccessKey=$EVENTGRID_KEY --output none
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }} --output none
+                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT --output none
+                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY --output none
 
     build-and-deploy:
         name: 'Build and Deploy DNet Bot'
@@ -177,7 +176,7 @@ jobs:
                     cd DNetBotFunctions-Release
                     zip -r ../dnet-func-release.zip *
                     cd ..
-                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-function --src dnet-func-release.zip
+                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-function --src dnet-func-release.zip --output none
 
             # Logout of Azure CLI
           - name: Logout of Azure
@@ -209,14 +208,14 @@ jobs:
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client 
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name channel
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name guild
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name messages
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name role
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client  --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name channel --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name guild --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name messages --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name role --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage --output none
             
             # Proxy Subscribe to the Return Topic
           - name: Subscribe Proxy to Topics
@@ -231,7 +230,7 @@ jobs:
                 inlineScript: |
                   echo "::add-mask::$SUBSCRIPTION_NAME"
                   echo "::add-mask::$ENDPOINT_ADDRESS"
-                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --output none
 
             # Function Subscribe to the Message Topic
           - name: Subscribe Proxy to Topics
@@ -246,7 +245,7 @@ jobs:
                 inlineScript: |
                   echo "::add-mask::$SUBSCRIPTION_NAME"
                   echo "::add-mask::$ENDPOINT_ADDRESS"
-                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
             
             # Logout of Azure CLI
           - name: Logout of Azure
