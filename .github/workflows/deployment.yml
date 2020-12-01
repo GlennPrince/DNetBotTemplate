@@ -112,8 +112,12 @@ jobs:
             uses: azure/CLI@v1
             env:
                 EVENTGRID_NAME: ${{ env.DNETBOT_NAME }}-eventgrid-domain
-                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
+                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
                 WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
+            run: |
+                echo: "::add-mask::$EVENTGRID_ENDPOINT"
+                echo: "::add-mask::$EVENTGRID_KEY"
+                echo: "::add-mask::${{ secrets.DISCORD_BOT_TOKEN }}
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
@@ -167,14 +171,14 @@ jobs:
           - name: 'Run Azure Functions Deployment'
             uses: azure/CLI@v1
             env:
-                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-funcs
+                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
                     cd DNetBotFunctions-Release
                     zip -r ../dnet-func-release.zip *
                     cd ..
-                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-funcs --src dnet-func-release.zip
+                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-function --src dnet-func-release.zip
 
             # Logout of Azure CLI
           - name: Logout of Azure
@@ -206,7 +210,7 @@ jobs:
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client 
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name channel
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name guild
@@ -223,6 +227,9 @@ jobs:
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
                 ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
+            run: |
+                echo: "::add-mask::$SUBSCRIPTION_NAME"
+                echo: "::add-mask::$ENDPOINT_ADDRESS"
             with:
                 azcliversion: 2.0.72
                 inlineScript: |
@@ -234,8 +241,11 @@ jobs:
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
-                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-funcs/functions/NewMessageEvent
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/NewMessageEvent
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
+            run: |
+                echo: "::add-mask::$SUBSCRIPTION_NAME"
+                echo: "::add-mask::$ENDPOINT_ADDRESS"
             with:
                 azcliversion: 2.0.72
                 inlineScript: |
