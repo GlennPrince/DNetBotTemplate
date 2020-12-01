@@ -27,7 +27,7 @@ env:
     DOTNET_VERSION: '3.1.403'                                                       # SDK Version to use
     AZURE_LOCATION: 'eastus'                                                        # Resource Location
     AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
-    AZURE_WEB_SKU: 'S1'                                                             # Size of the WebApp to deploy
+    AZURE_WEB_SKU: 'B1'                                                             # Size of the WebApp to deploy
 
 jobs:
     deploy-azure-infrastructure:
@@ -99,10 +99,16 @@ jobs:
                 resourceGroupName: ${{ env.AZURE_RG }}
                 template: ./azure-dnet-webapp.json
                 parameters:
-                    webAppName=${{ env.DNETBOT_NAME }}-proxy
+                    subscriptionId=${{ secrets.SUBSCRIPTION_ID }}
+                    name=${{ env.DNETBOT_NAME }}-proxy
                     location=${{ env.AZURE_LOCATION }}
+                    resourceGroup=${{ env.AZURE_RG }}
+                    alwaysOn=true
                     sku=${{ env.AZURE_WEB_SKU }}
                     linuxFxVersion=DOTNETCORE|3.1
+                    workerSize=0
+                    workerSizeId=0
+                    numberOfWorkers=1
 
             # Add WebApp and Function Environment Variables
           - name: 'Add Environment Variables'
@@ -116,9 +122,9 @@ jobs:
                 inlineScript: |
                     EVENTGRID_KEY=$(az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 -o tsv)
                     EVENTGRID_ENDPOINT=$(az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint -o tsv)
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainEndPoint=$EVENTGRID_ENDPOINT
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings EventGridDomainAccessKey=$EVENTGRID_KEY
-                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainEndPoint=$EVENTGRID_ENDPOINT
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainAccessKey=$EVENTGRID_KEY
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY
 
