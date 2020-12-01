@@ -117,8 +117,8 @@ jobs:
             with:
                 azcliversion: 2.14.2
                 inlineScript: |
-                    echo "::add-mask::$EVENTGRID_ENDPOINT"
-                    echo "::add-mask::$EVENTGRID_KEY"
+                    echo ::add-mask::$EVENTGRID_ENDPOINT
+                    echo ::add-mask::$EVENTGRID_KEY
                     EVENTGRID_KEY=$(az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 -o tsv)
                     EVENTGRID_ENDPOINT=$(az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint -o tsv)
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainEndPoint=$EVENTGRID_ENDPOINT --output none
@@ -228,8 +228,8 @@ jobs:
             with:
                 azcliversion: 2.0.72
                 inlineScript: |
-                  echo "::add-mask::$SUBSCRIPTION_NAME"
-                  echo "::add-mask::$ENDPOINT_ADDRESS"
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --output none
 
             # Function Subscribe to the Message Topic
@@ -243,8 +243,8 @@ jobs:
             with:
                 azcliversion: 2.0.72
                 inlineScript: |
-                  echo "::add-mask::$SUBSCRIPTION_NAME"
-                  echo "::add-mask::$ENDPOINT_ADDRESS"
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
             
             # Logout of Azure CLI
