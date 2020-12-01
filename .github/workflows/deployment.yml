@@ -226,14 +226,14 @@ jobs:
                 ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
             with:
-                azcliversion: 2.0.72
+                azcliversion: 2.14.2
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --output none
 
             # Function Subscribe to the Message Topic
-          - name: Subscribe Proxy to Topics
+          - name: Subscribe Function to Topics
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
@@ -242,7 +242,7 @@ jobs:
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
 
             with:
-                azcliversion: 2.0.72
+                azcliversion: 2.14.2
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
