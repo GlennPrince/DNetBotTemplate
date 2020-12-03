@@ -124,8 +124,6 @@ jobs:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
-            with:
-                ref: development
     
             # Setup Dotnet Core
           - name: 'Configure DotNet Core'
