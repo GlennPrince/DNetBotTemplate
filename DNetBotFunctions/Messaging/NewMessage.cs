@@ -2,14 +2,11 @@
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
 using System;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using DNetUtils.Entities;
-using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 
 namespace DNetBotFunctions.Messaging

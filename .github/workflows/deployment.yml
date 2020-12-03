@@ -8,154 +8,235 @@
 # build into your Azure tenancy:
 #
 # AZURE_CREDENTIALS - The Service Principle details for Azure
-# SUBSCRIPTION_ID - Your Subscription ID
+# SUBSCRIPTION_ID - Your Azure Subscription ID
+# DISCORD_BOT_TOKEN - The access token for your bot
 
 name: DeployDNetBot
 
 on:
-    push:
-        branches: [ master, development ]
-    pull_request:
-        branches: [ master ]
+    workflow_dispatch:
+    release:
+        types: [published]
 
 # Configuration Items
 # -------------------
 # These Variables Change based on the Environment you are 
 # deploying to. You also need to set the secrets above.
 env:
-    # DNet Bot Naming Prefix for Resources
-    DNETBOT_NAME: 'DNetBot'
-    # SDK Version to use
-    DOTNET_VERSION: '3.1.x'
-    # Resource Location
-    AZURE_LOCATION: 'us-east'
-    # Resource Group Name to use
-    AZURE_RG: 'RG-DnetBot'
-    # Size of the WebApp to deploy
-    AZURE_WEB_SKU: 'F1'
+    DNETBOT_NAME: 'discordnetbot'                                                   # DNet Bot Naming Prefix for Resources (Lowercase, No Spaces or Special Characters)
+    DOTNET_VERSION: '3.1.403'                                                       # SDK Version to use
+    AZURE_LOCATION: 'eastus'                                                        # Resource Location
+    AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
+    AZURE_WEB_SKU: 'B1'                                                             # Size of the WebApp to deploy
 
 jobs:
     deploy-azure-infrastructure:
-        runs-on: ubuntu-latest
-        steps:
-            # Login via the Azure Module
-            - name: Login via Azure Module
-            uses: azure/login@v1
-            with:
-                creds: ${{secrets.AZURE_CREDENTIALS}}
-                enable-AzPSSession: true
-
-            # Deploy Storage Components First
-            - name: Deploy Azure Storage Components
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
-                template: ./azure-storage.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
-
-            # Deploy Monitoring Resources
-            - name: Deploy Azure Monitoring Components
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
-                template: ./azure-monitoring.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
-
-            # Deploy EventGrid Resources
-            - name: Deploy Azure EventGrid Components
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
-                template: ./azure-eventgrid.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    eventgGridDomainName=${{ env.DNETBOT_NAME }}_EventGridDomain
-
-            # Deploy Function Resources
-            - name: Deploy Azure Function Components
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
-                template: ./azure-functions.json
-                parameters:
-                    funcAppName=${{ env.DNETBOT_NAME }}_Funcs
-                    location=${{ env.AZURE_LOCATION }}
-                    runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
-                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
-
-            # Deploy WebApp Resources
-            - name: Deploy Azure WebApp Components
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: {{ env.AZURE_RG }}
-                template: ./azure-functions.json
-                parameters:
-                    webAppName=${{ env.DNETBOT_NAME }}_Proxy
-                    location=${{ env.AZURE_LOCATION }}
-                    sku=${{ env.AZURE_WEB_SKU }}
-                    runtime=dotnet
-                    appInsightsName=${{ env.DNETBOT_NAME }}_Insights
-                    appStorageName=${{ env.DNETBOT_NAME }}_Storage
-
-    build-and-deploy:
+        name: 'Deploy Azure Infrastructure'
         runs-on: ubuntu-latest
         steps:
             # Check out the source code from the main branch
-            - name: Check Out Main
+          - name: 'Check Out Main'
             uses: actions/checkout@main
 
-            # Login via the Azure Module
-            - name: Login via Azure Module
+          - name: Login via Azure Module                                              # Login via the Azure Module
             uses: azure/login@v1
             with:
-                creds: ${{secrets.AZURE_CREDENTIALS}}
+                creds: ${{ secrets.AZURE_CREDENTIALS }}
                 enable-AzPSSession: true
-    
-            # Retrieve Secrets from Azure Secret Vault
+
+            # Deploy Storage Components First
+          - name: 'Deploy Azure Storage Components'
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: ${{ env.AZURE_RG }}
+                template: ./azure-dnet-storage.json
+                parameters:
+                    location=${{ env.AZURE_LOCATION }}
+                    storageAccountName=${{ env.DNETBOT_NAME }}storage
+
+            # Deploy EventGrid Resources
+          - name: 'Deploy Azure EventGrid Components'
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: ${{ env.AZURE_RG }}
+                template: ./azure-dnet-eventgrid.json
+                parameters:
+                    location=${{ env.AZURE_LOCATION }}
+                    eventGridName=${{ env.DNETBOT_NAME }}-eventgrid-domain
+
+            # Deploy Function Resources
+          - name: 'Deploy Azure Function Components'
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: ${{ env.AZURE_RG }}
+                template: ./azure-dnet-functions.json
+                parameters:
+                    name=${{ env.DNETBOT_NAME }}-function
+                    location=${{ env.AZURE_LOCATION }}
+                    storageAccountName=${{ env.DNETBOT_NAME }}storage
+                    use32BitWorkerProcess=false
+
+            # Deploy WebApp Resources
+          - name: 'Deploy Azure WebApp Components'
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: ${{ env.AZURE_RG }}
+                template: ./azure-dnet-webapp.json
+                parameters:
+                    name=${{ env.DNETBOT_NAME }}-proxy
+                    location=${{ env.AZURE_LOCATION }}
+                    alwaysOn=true
+                    sku=${{ env.AZURE_WEB_SKU }}
+                    linuxFxVersion=DOTNETCORE|3.1
+                    workerSize=0
+                    workerSizeId=0
+                    numberOfWorkers=1
+
+            # Add WebApp and Function Environment Variables
+          - name: 'Add Environment Variables'
+            uses: azure/CLI@v1
+            env:
+                EVENTGRID_NAME: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
+                WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                    echo ::add-mask::$EVENTGRID_ENDPOINT
+                    echo ::add-mask::$EVENTGRID_KEY
+                    EVENTGRID_KEY=$(az eventgrid domain key list --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query key1 -o tsv)
+                    EVENTGRID_ENDPOINT=$(az eventgrid domain show --name ${{ env.EVENTGRID_NAME }} --resource-group ${{ env.AZURE_RG }} --query endpoint -o tsv)
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainEndPoint=$EVENTGRID_ENDPOINT --output none
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainAccessKey=$EVENTGRID_KEY --output none
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }} --output none
+                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT --output none
+                    az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY --output none
+
+    build-and-deploy:
+        name: 'Build and Deploy DNet Bot'
+        needs: deploy-azure-infrastructure
+        runs-on: ubuntu-latest
+        steps:
+            # Check out the source code from the main branch
+          - name: 'Check Out Main'
+            uses: actions/checkout@main
+            with:
+                ref: development
     
             # Setup Dotnet Core
-            - name: Configure DotNet Core
+          - name: 'Configure DotNet Core'
             uses: actions/setup-dotnet@v1
             with:
                 dotnet-version: ${{ env.DOTNET_VERSION }} 
 
             # Run DotNet Build and Publish for DNetBot
-            - name: dotnet build and publish
+          - name: 'Dotnet build and publish'
             run: |
                 dotnet restore
-                dotnet build DNetBot --configuration Release
-                dotnet publish -c Release -o './DNetBot'
+                dotnet build --configuration Release
+                dotnet publish DNetBot -c Release -o './DNetBot-Release'
+                dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
 
-            # Run DotNet Build and Publish for DNetBotFunctions
-            - name: dotnet build and publish
-            run: |
-                dotnet restore
-                dotnet build DNetBotFunctions --configuration Release
-                dotnet publish -c Release -o './DNetBotFunctions'
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
 
             # Deploy the DNetBot WebApp
-            - name: 'Deploy DnetBot WebApp'
+          - name: 'Deploy DnetBot WebApp'
             uses: azure/webapps-deploy@v2
-            with: 
-                app-name: $${{ env.DNETBOT_NAME }}_Proxy
-                publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
-                package: './DNetBot'
+            with:
+                app-name: ${{ env.DNETBOT_NAME }}-proxy
+                package: './DNetBot-Release'
 
             # Deploy the DNetBot Functions
-            - name: 'Run Azure Functions Action'
-            uses: Azure/functions-action@v1
-            id: fa
+          - name: 'Run Azure Functions Deployment'
+            uses: azure/CLI@v1
+            env:
+                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
             with:
-                app-name: ${{ env.DNETBOT_NAME }}_Funcs
-                package: './DNetBotFunctions'
-                publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+                azcliversion: 2.14.2
+                inlineScript: |
+                    cd DNetBotFunctions-Release
+                    zip -r ../dnet-func-release.zip *
+                    cd ..
+                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-function --src dnet-func-release.zip --output none
+
+            # Logout of Azure CLI
+          - name: Logout of Azure
+            run: az logout
+
+    eventgrid-topic-creation:
+        name: 'Create EventGrid Topics'
+        runs-on: ubuntu-latest
+        needs: [deploy-azure-infrastructure, build-and-deploy]
+        steps:
+
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+
+            # Check out the source code from the main branch
+          - name: 'Check Out Main'
+            uses: actions/checkout@main
+            with:
+                ref: development
+
+            # Creates all the topics in the domain to support bot events
+          - name: Create Event Grid Topics
+            uses: azure/CLI@v1
+            env:
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client  --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name channel --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name guild --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name messages --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name role --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage --output none
+            
+            # Proxy Subscribe to the Return Topic
+          - name: Subscribe Proxy to Topics
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-proxy-returnmessage
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --output none
+
+            # Function Subscribe to the New Message Topic
+          - name: Subscribe New Message Function to Topic
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/NewMessage
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
+
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
+            
+            # Logout of Azure CLI
+          - name: Logout of Azure
+            run: az logout
