@@ -93,7 +93,8 @@
     }
   },
   "variables": {
-    "hostingPlanName": "[concat(parameters('name'),'-hostingplan')]"
+    "hostingPlanName": "[concat(parameters('name'),'-hostingplan')]",
+    "insightsName": "[concat(parameters('name'),'-insights')]"
   },
   "resources": [
     {
@@ -103,12 +104,18 @@
       "location": "[parameters('location')]",
       "tags": null,
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('microsoft.insights/components', variables('insightsName'))]"
       ],
       "properties": {
         "name": "[parameters('name')]",
         "siteConfig": {
-          "appSettings": [],
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components', variables('insightsName')), '2018-05-01-preview').InstrumentationKey]"
+            }
+          ],
           "linuxFxVersion": "[parameters('linuxFxVersion')]",
           "alwaysOn": "[parameters('alwaysOn')]"
         },
@@ -134,6 +141,20 @@
       "sku": {
         "Tier": "[parameters('sku')]",
         "Name": "[parameters('sku')]"
+      }
+    },
+    {
+      "apiVersion": "2018-05-01-preview",
+      "name": "[variables('insightsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[parameters('location')]",
+      "kind": "",
+      "tags": {
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites/', variables('insightsName')))]": "Resource"
+      },
+      "properties": {
+        "ApplicationId": "[variables('insightsName')]",
+        "Application_Type": "web"
       }
     }
   ]

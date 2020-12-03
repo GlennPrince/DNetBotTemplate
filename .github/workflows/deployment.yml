@@ -8,15 +8,15 @@
 # build into your Azure tenancy:
 #
 # AZURE_CREDENTIALS - The Service Principle details for Azure
-# SUBSCRIPTION_ID - Your Subscription ID
+# SUBSCRIPTION_ID - Your Azure Subscription ID
+# DISCORD_BOT_TOKEN - The access token for your bot
 
 name: DeployDNetBot
 
 on:
-    push:
-        branches: [ main, development ]
-    pull_request:
-        branches: [ main ]
+    workflow_dispatch:
+    release:
+        types: [published]
 
 # Configuration Items
 # -------------------
@@ -54,17 +54,6 @@ jobs:
                 parameters:
                     location=${{ env.AZURE_LOCATION }}
                     storageAccountName=${{ env.DNETBOT_NAME }}storage
-
-            # Deploy Monitoring Resources
-          - name: 'Deploy Azure Monitoring Components'
-            uses: azure/arm-deploy@v1
-            with:
-                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-                resourceGroupName: ${{ env.AZURE_RG }}
-                template: ./azure-dnet-monitoring.json
-                parameters:
-                    location=${{ env.AZURE_LOCATION }}
-                    appInsightsName=${{ env.DNETBOT_NAME }}-insights
 
             # Deploy EventGrid Resources
           - name: 'Deploy Azure EventGrid Components'
@@ -232,8 +221,8 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --output none
 
-            # Function Subscribe to the Message Topic
-          - name: Subscribe Function to Topics
+            # Function Subscribe to the New Message Topic
+          - name: Subscribe New Message Function to Topic
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
