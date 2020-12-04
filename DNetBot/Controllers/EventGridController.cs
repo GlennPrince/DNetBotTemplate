@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,23 +22,30 @@ namespace DNetBot.Controllers
     {
         private readonly ILogger _logger;
         private readonly DiscordSocketService _discordSocketService;
+        private readonly IConfiguration _config;
+        private string _webHookToken;
 
-        public EventGridController(ILogger<string> logger, DiscordSocketService discordSocketService)
+        public EventGridController(ILogger<string> logger, DiscordSocketService discordSocketService, IConfiguration config)
         {
             _logger = logger;
             _discordSocketService = discordSocketService;
+            _config = config;
+            _webHookToken = _config["WEBHOOK_TOKEN"];
         }
 
         // POST: /api/EventGrid/ReturnMessage
         [HttpPost("returnmessage")]
-        public IActionResult ReturnMessage([FromBody] EventGridEvent[] events)
+        public IActionResult ReturnMessage([FromQuery]string token, [FromBody] EventGridEvent[] events)
         {
             foreach (var eventGridEvent in events)
             {
                 _logger.Log(LogLevel.Information, "Event Grid Event Received. Type: " + eventGridEvent.EventType.ToString());
 
+                // 0. Check to ensure that the calling service is using our secret token
+                if (!string.Equals(token, _webHookToken)) return Unauthorized();
+
                 // 1. If there is no EventType through a bad request
-                if (eventGridEvent == null) return BadRequest();
+                else if (eventGridEvent == null) return BadRequest();
 
                 // 2. If the EventType is the Event Grid handshake event, respond with a SubscriptionValidationResponse.
                 else if (eventGridEvent.EventType == EventTypes.EventGridSubscriptionValidationEvent)

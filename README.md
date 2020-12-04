@@ -12,6 +12,7 @@ This bot now uses GitHub actions to build and deploy the infrastructure and code
     - `AZURE_CREDENTIALS` with the JSON from step 1
     - `SUBSCRIPTION_ID` with your Azure Subscription ID
     - `DISCORD_BOT_TOKEN` with your Bot token from the Discord Developer Portal
+    - `WEBHOOK_TOKEN` with a generated secret of your choice to protect your webhooks
 5) Modify the environment variables at the top of the `deployment.yml` file to suit your needs / customize the naming of resources:
 ```
 env:

@@ -3,7 +3,9 @@ All notable changes to this project will be documented in this file. The format 
  
 ## [Unreleased]
  
-
+- 
+- [Add Token to WebHook](https://github.com/GlennPrince/DNetBotTemplate/issues/10)
+  Added a Token check for the webhook so that everyone can't just send correct payloads to it
  
 ## [0.2.0] - 2020-12-02
 
