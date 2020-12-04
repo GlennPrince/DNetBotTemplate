@@ -35,17 +35,17 @@ namespace DNetBot
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
                     configLogging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
-                    configLogging.AddApplicationInsights();
+                    configLogging.AddApplicationInsights(hostContext.Configuration.GetValue<string>("APPINSIGHTS_INSTRUMENTATIONKEY"));
                     configLogging.AddConsole();
                     configLogging.AddDebug();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().ConfigureLogging(logging =>
+                    webBuilder.UseStartup<Startup>().ConfigureLogging((hostContext, logging) =>
                     {
                         logging.AddConsole();
                         logging.AddDebug();
-                        logging.AddApplicationInsights();
+                        logging.AddApplicationInsights(hostContext.Configuration.GetValue<string>("APPINSIGHTS_INSTRUMENTATIONKEY"));
                     }).UseContentRoot("webroot").UseKestrel();
                 })
                 .UseConsoleLifetime();
