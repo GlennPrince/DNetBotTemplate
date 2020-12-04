@@ -35,6 +35,7 @@ namespace DNetBot
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
                     configLogging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
+                    configLogging.AddApplicationInsights();
                     configLogging.AddConsole();
                     configLogging.AddDebug();
                 })
@@ -44,6 +45,7 @@ namespace DNetBot
                     {
                         logging.AddConsole();
                         logging.AddDebug();
+                        logging.AddApplicationInsights();
                     }).UseContentRoot("webroot").UseKestrel();
                 })
                 .UseConsoleLifetime();
