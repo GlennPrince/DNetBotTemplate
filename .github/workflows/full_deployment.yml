@@ -113,6 +113,7 @@ jobs:
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainEndPoint=$EVENTGRID_ENDPOINT --output none
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_EventGridDomainAccessKey=$EVENTGRID_KEY --output none
                     az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }} --output none
+                    az webapp config appsettings set -g ${{ env.AZURE_RG }} -n ${{ env.WEBAPP_NAME }} --settings BOT_WEBHOOK_TOKEN=${{ secrets.WEBHOOK_TOKEN }} --output none
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridDomain=$EVENTGRID_ENDPOINT --output none
                     az functionapp config appsettings set --resource-group ${{ env.AZURE_RG }} --name ${{ env.FUNCTION_NAME }} --settings EventGridKey=$EVENTGRID_KEY --output none
 
@@ -210,7 +211,7 @@ jobs:
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-proxy-returnmessage
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
-                ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage
+                ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage?token=${{ secrets.WEBHOOK_TOKEN }}
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
             with:
                 azcliversion: 2.14.2

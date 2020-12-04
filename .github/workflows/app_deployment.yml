@@ -1,0 +1,147 @@
+# ------------------------------------------------------------
+# GitHub Action to Redeploy only the application components
+# ------------------------------------------------------------
+# 
+# Modify the Environment Variables below if you want to change
+# any of the default values, otherwise the following secrets
+# need to be set to ensure the GitHub actions can connect and
+# build into your Azure tenancy:
+#
+# AZURE_CREDENTIALS - The Service Principle details for Azure
+# SUBSCRIPTION_ID - Your Azure Subscription ID
+# DISCORD_BOT_TOKEN - The access token for your bot
+
+name: DeployDNetBotCode
+
+on:
+    workflow_dispatch:
+
+# Configuration Items
+# -------------------
+# These Variables Change based on the Environment you are 
+# deploying to. You also need to set the secrets above.
+env:
+    DNETBOT_NAME: 'discordnetbot'                                                   # DNet Bot Naming Prefix for Resources (Lowercase, No Spaces or Special Characters)
+    DOTNET_VERSION: '3.1.403'                                                       # SDK Version to use
+    AZURE_RG: 'RG-DNet-Bot'                                                         # Resource Group Name to use
+
+jobs:
+    build-and-deploy:
+        name: 'Build and Deploy DNet Bot'
+        runs-on: ubuntu-latest
+        steps:
+            # Check out the source code from the main branch
+          - name: 'Check Out Main'
+            uses: actions/checkout@main
+    
+            # Setup Dotnet Core
+          - name: 'Configure DotNet Core'
+            uses: actions/setup-dotnet@v1
+            with:
+                dotnet-version: ${{ env.DOTNET_VERSION }} 
+
+            # Run DotNet Build and Publish for DNetBot
+          - name: 'Dotnet build and publish'
+            run: |
+                dotnet restore
+                dotnet build --configuration Release
+                dotnet publish DNetBot -c Release -o './DNetBot-Release'
+                dotnet publish DNetBotFunctions -c Release -o './DNetBotFunctions-Release'
+
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+
+            # Deploy the DNetBot WebApp
+          - name: 'Deploy DnetBot WebApp'
+            uses: azure/webapps-deploy@v2
+            with:
+                app-name: ${{ env.DNETBOT_NAME }}-proxy
+                package: './DNetBot-Release'
+
+            # Deploy the DNetBot Functions
+          - name: 'Run Azure Functions Deployment'
+            uses: azure/CLI@v1
+            env:
+                FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                    cd DNetBotFunctions-Release
+                    zip -r ../dnet-func-release.zip *
+                    cd ..
+                    az functionapp deployment source config-zip -g ${{ env.AZURE_RG }} -n ${{ env.DNETBOT_NAME }}-function --src dnet-func-release.zip --output none
+
+            # Logout of Azure CLI
+          - name: Logout of Azure
+            run: az logout
+
+    eventgrid-topic-creation:
+        name: 'Create EventGrid Topics'
+        runs-on: ubuntu-latest
+        needs: [deploy-azure-infrastructure, build-and-deploy]
+        steps:
+
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+
+            # Check out the source code from the main branch
+          - name: 'Check Out Main'
+            uses: actions/checkout@main
+
+            # Creates all the topics in the domain to support bot events
+          - name: Create Event Grid Topics
+            uses: azure/CLI@v1
+            env:
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client  --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name channel --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name guild --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name messages --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name role --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user --output none
+                  az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage --output none
+            
+            # Proxy Subscribe to the Return Topic
+          - name: Subscribe Proxy to Topics
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-proxy-returnmessage
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage?token=${{ secrets.WEBHOOK_TOKEN }}
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --output none
+
+            # Function Subscribe to the New Message Topic
+          - name: Subscribe New Message Function to Topic
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/NewMessage
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
+
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
+            
+            # Logout of Azure CLI
+          - name: Logout of Azure
+            run: az logout

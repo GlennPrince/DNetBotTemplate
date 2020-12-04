@@ -23,7 +23,7 @@ namespace DNetBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddApplicationInsightsTelemetryWorkerService();
+            services.AddApplicationInsightsTelemetryWorkerService(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
             services.AddSingleton<DiscordSocketService>();
         }
 
