@@ -38,8 +38,11 @@ namespace DNetUtils.Entities
             Status = user.Status;
             IsBot = user.IsBot;
 
-            ActivityType = user.Activity.Type;
-            ActivityName = user.Activity.Name;
+            if (user.Activity != null)
+            {
+                ActivityType = user.Activity.Type;
+                ActivityName = user.Activity.Name;
+            }
         }
 
         public DiscordUser(RestUser user)
@@ -50,8 +53,11 @@ namespace DNetUtils.Entities
             Status = user.Status;
             IsBot = user.IsBot;
 
-            ActivityType = user.Activity.Type;
-            ActivityName = user.Activity.Name;
+            if (user.Activity != null)
+            {
+                ActivityType = user.Activity.Type;
+                ActivityName = user.Activity.Name;
+            }
         }
 
         public DiscordUser(SocketGuildUser user)
@@ -62,8 +68,12 @@ namespace DNetUtils.Entities
             Status = user.Status;
             IsBot = user.IsBot;
 
-            ActivityType = user.Activity.Type;
-            ActivityName = user.Activity.Name;
+            if (user.Activity != null)
+            {
+                ActivityType = user.Activity.Type;
+                ActivityName = user.Activity.Name;
+            }
+
             AvatarId = user.AvatarId;
             GuildId = user.Guild.Id;
             Hierarchy = user.Hierarchy;
@@ -82,8 +92,12 @@ namespace DNetUtils.Entities
             Status = user.Status;
             IsBot = user.IsBot;
 
-            ActivityType = user.Activity.Type;
-            ActivityName = user.Activity.Name;
+            if (user.Activity != null)
+            {
+                ActivityType = user.Activity.Type;
+                ActivityName = user.Activity.Name;
+            }
+
             AvatarId = user.AvatarId;
             GuildId = user.GuildId;
             IsDeafened = user.IsDeafened;
@@ -101,8 +115,11 @@ namespace DNetUtils.Entities
             Status = user.Status;
             IsBot = user.IsBot;
 
-            ActivityType = user.Activity.Type;
-            ActivityName = user.Activity.Name;
+            if (user.Activity != null)
+            {
+                ActivityType = user.Activity.Type;
+                ActivityName = user.Activity.Name;
+            }
         }
 
         public DiscordUser(RestSelfUser user)
@@ -113,8 +130,11 @@ namespace DNetUtils.Entities
             Status = user.Status;
             IsBot = user.IsBot;
 
-            ActivityType = user.Activity.Type;
-            ActivityName = user.Activity.Name;
+            if (user.Activity != null)
+            {
+                ActivityType = user.Activity.Type;
+                ActivityName = user.Activity.Name;
+            }
         }
 
         /// <summary> 
