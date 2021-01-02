@@ -37,6 +37,26 @@ namespace DNetBot.Services
             return SendEvent("messages", "UpdatedMessage", "DNetBot.Message.Updated", serializedMessage.ToString());
         }
 
+        private Task ReactionAdded(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reaction Added to Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
+            var serializedReaction = reaction.ToString();
+            return SendEvent("reaction", "AddReaction", "DNetBot.Reaction.Add", serializedReaction);
+        }
+
+        private Task ReactionRemoved(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reaction Removed off Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
+            var serializedReaction = reaction.ToString();
+            return SendEvent("reaction", "RemoveReaction", "DNetBot.Reaction.Delete", serializedReaction);
+        }
+
+        private Task ReactionCleared(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reactions Cleared off Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
+            return SendEvent("reaction", "ClearReactions", "DNetBot.Reaction.Clear", message.Id.ToString());
+        }
+
         public async Task SendMessage(DiscordMessage message)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Sending message -- Channel: " + message.ChannelId + " -- Content: " + message.Content);

@@ -9,9 +9,7 @@ namespace DNetBot.Services
 {
     public partial class DiscordSocketService : IHostedService
     {
-        //
-        // Summary:
-        //     Fired when a user is updated.
+        // Handles any actions when a user is updated.
         private Task UserUpdate(SocketUser oldUser, SocketUser newUser)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User Information Updated For: " + newUser.Id);
@@ -41,6 +39,20 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left Server: " + user.Guild.Id);
             var serializedUser = new DiscordUser(user).ToString();
             return SendEvent("user", "UserLeft", "DNetBot.User.Left", serializedUser);
+        }
+
+        private Task PrivateGroupAdd(SocketGroupUser user)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left Server: " + user.Channel.Id);
+            var serializedUser = new DiscordUser(user).ToString();
+            return SendEvent("user", "PrivateGroupAdd", "DNetBot.Group.Add", serializedUser);
+        }
+
+        private Task PrivateGroupRemove(SocketGroupUser user)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left private group: " + user.Channel.Id);
+            var serializedUser = new DiscordUser(user).ToString();
+            return SendEvent("user", "PrivateGroupRemove", "DNetBot.Group.Remove", serializedUser);
         }
     }
 }

@@ -145,11 +145,18 @@ namespace DNetBot.Services
             discordClient.UserLeft += async u => await UserLeft(u);
             discordClient.UserUpdated += async (o, n) => await UserUpdate(o, n);
             discordClient.GuildMemberUpdated += async (o, n) => await MemberUpdate(o, n);
+            discordClient.RecipientAdded += async u => await PrivateGroupAdd(u);
+            discordClient.RecipientRemoved += async u => await PrivateGroupRemove(u);
 
             // General message handling event
             discordClient.MessageReceived += async m => await ReceiveMessage(m);
             discordClient.MessageDeleted += async (m, c) => await DeletedMessage(m.Id, c);
             discordClient.MessageUpdated += async (m, u, c) => await UpdatedMessage(m.Id, u, c);
+
+            // Reactions Handling
+            discordClient.ReactionAdded += async (m, c, r) => await ReactionAdded(m, c, r);
+            discordClient.ReactionRemoved += async (m, c, r) => await ReactionRemoved(m, c, r);
+            discordClient.ReactionsCleared += async (m, c) => await ReactionCleared(m, c);
 
             // Bot specific events
             discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);
