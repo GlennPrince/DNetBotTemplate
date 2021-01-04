@@ -11,7 +11,7 @@ using Microsoft.Azure.EventGrid;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace DNetBotFunctions.Messaging
+namespace DNetBotFunctions.Events.Messaging
 {
     public static class NewMessage
     {
