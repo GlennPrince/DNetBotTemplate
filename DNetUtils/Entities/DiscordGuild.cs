@@ -234,7 +234,52 @@ namespace DNetUtils.Entities
 
         public DiscordGuild(string json)
         {
-            JsonConvert.DeserializeObject<DiscordGuild>(json);
+            var guild = JsonConvert.DeserializeObject<DiscordGuild>(json);
+
+            Id = guild.Id;
+            Name = guild.Name;
+            IconId = guild.IconId;
+            IconURL = guild.IconURL;
+            SplashId = guild.SplashId;
+            SplashURL = guild.SplashURL;
+            MemberCount = guild.MemberCount;
+
+            AFKTimeout = guild.AFKTimeout;
+            IsEmbeddable = guild.IsEmbeddable;
+            DefaultMessageNotifications = (int)guild.DefaultMessageNotifications;
+            ExplicitContentFilter = (int)guild.ExplicitContentFilter;
+            MfaLevel = (int)guild.MfaLevel;
+            VerificationLevel = (int)guild.VerificationLevel;
+
+            ApplicationId = guild.ApplicationId;
+            OwnerId = guild.OwnerId;
+            DefaultChannelId = guild.DefaultChannelId;
+            EmbedChannelId = guild.EmbedChannelId;
+            EveryoneId = guild.EveryoneId;
+            SystemChannelId = guild.SystemChannelId;
+
+            ChannelIds = new List<ulong>();
+            foreach (var channel in guild.ChannelIds)
+                ChannelIds.Add(channel);
+
+            VoiceIds = new List<ulong>();
+            foreach (var voice in guild.VoiceIds)
+                VoiceIds.Add(voice);
+
+            CategoryIds = new List<ulong>();
+            foreach (var category in guild.CategoryIds)
+                CategoryIds.Add(category);
+
+            RoleIds = new List<ulong>();
+            foreach (var role in guild.RoleIds)
+                RoleIds.Add(role);
+
+            EmoteIds = new List<ulong>();
+            foreach (var emote in guild.EmoteIds)
+                EmoteIds.Add(emote);
+
+            CreatedAt = guild.CreatedAt;
+            VoiceRegionId = guild.VoiceRegionId;
         }
 
         /// <summary> 

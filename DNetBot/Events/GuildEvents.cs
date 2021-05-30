@@ -33,7 +33,9 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Became Available: " + guild.Id);
             var serializedGuild = new DiscordGuild(guild).ToString();
-            return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", serializedGuild);
+
+            cachedData.StringSet("guild:" + guild.Id.ToString(), serializedGuild);
+            return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", guild.Id.ToString());
         }
 
         // Handles any actions required if the guild updates it's details
@@ -41,7 +43,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Updated: " + newGuild.Id);
             var serializedGuild = new DiscordGuild(newGuild).ToString();
-            return SendEvent("guild", "UpdatedGuild", "DNetBot.Guild.Updated", serializedGuild);
+            return SendEvent("guild", "UpdatedGuild", "DNetBot.Guild.Updated", newGuild.Id.ToString());
         }
 
         // Handles processes for when a guild becomes unavailable

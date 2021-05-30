@@ -6,6 +6,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,8 +28,12 @@ namespace DNetBot.Services
         private static EventGridClient eventGridClient;
         private TopicCredentials eventGridCredentials;
 
+        private readonly IConnectionMultiplexer _connectionMultiplexer;
+        private IDatabase cachedData;
+
         public DiscordSocketService(
             ILogger<DiscordSocketService> logger,
+            IConnectionMultiplexer multiplexer,
             IHostApplicationLifetime appLifetime,
             IConfiguration config)
         {
@@ -38,6 +43,7 @@ namespace DNetBot.Services
             botToken = _config["DISCORD_BOT_TOKEN"];
             eventGridDomainEndpoint = _config["EventGridDomainEndPoint"];
             eventGridDomainAccessKey = _config["eventGridDomainAccessKey"];
+            _connectionMultiplexer = multiplexer;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -76,6 +82,8 @@ namespace DNetBot.Services
             });
 
             ConfigureEventHandlers();
+
+            cachedData = _connectionMultiplexer.GetDatabase();
 
             discordClient.LoginAsync(Discord.TokenType.Bot, botToken).Wait();
             discordClient.StartAsync().Wait();

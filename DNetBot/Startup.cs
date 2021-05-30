@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Redis;
+using System;
 
 namespace DNetBot
 {
@@ -21,6 +23,7 @@ namespace DNetBot
         {
             services.AddControllers();
             services.AddApplicationInsightsTelemetryWorkerService(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration["RedisServer"]));
             services.AddSingleton<DiscordSocketService>();
         }
 

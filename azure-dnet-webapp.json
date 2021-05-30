@@ -90,6 +90,14 @@
     "linuxFxVersion": {
       "type": "string",
       "allowedValues": [ "DOTNETCORE|2.1", "DOTNETCORE|3.1" ]
+    },
+    "cacheName": {
+      "type": "string",
+      "defaultValue": "[concat(uniqueString(resourceGroup().id), '-cache')]",
+      "metadata": {
+        "description": "Redis Cache Name"
+      },
+      "minLength": 2
     }
   },
   "variables": {
@@ -114,6 +122,10 @@
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('microsoft.insights/components', variables('insightsName')), '2018-05-01-preview').InstrumentationKey]"
+            },
+            {
+              "name": "RedisServer",
+              "value": "[concat(parameters('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', parameters('cacheName')), '2015-08-01').primaryKey)]"
             }
           ],
           "linuxFxVersion": "[parameters('linuxFxVersion')]",

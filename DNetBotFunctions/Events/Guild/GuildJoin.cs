@@ -1,5 +1,5 @@
 // Default URL for triggering event grid function in the local environment.
-// https://4d5048c4f1ad.ngrok.io/runtime/webhooks/EventGrid?functionName=GuildJoin
+// https://4fb77cabbcf2.ngrok.io/runtime/webhooks/EventGrid?functionName=GuildJoin
 using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -24,6 +24,7 @@ namespace DNetBotFunctions.Events.Guild
             if (eventGridEvent.Subject.Equals("JoinedGuild") && eventGridEvent.EventType.Equals("DNetBot.Guild.Joined"))
             {
                 log.LogInformation("Guild Joined Event Triggered On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
+
                 var guild = JsonConvert.DeserializeObject<DiscordGuild>(eventGridEvent.Data.ToString());
 
                 DataStoreClient.InsertGuild(guild);

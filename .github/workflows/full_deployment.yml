@@ -55,6 +55,17 @@ jobs:
                     location=${{ env.AZURE_LOCATION }}
                     storageAccountName=${{ env.DNETBOT_NAME }}storage
 
+            # Deploy The Redis Cache Server
+          - name: 'Deploy Azure Redis Cache'
+            uses: azure/arm-deploy@v1
+            with:
+                subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+                resourceGroupName: ${{ env.AZURE_RG }}
+                template: ./azure-dnet-redis.json
+                parameters:
+                    location=${{ env.AZURE_LOCATION }}
+                    cacheName=${{ env.DNETBOT_NAME }}-cache
+
             # Deploy EventGrid Resources
           - name: 'Deploy Azure EventGrid Components'
             uses: azure/arm-deploy@v1
@@ -78,6 +89,7 @@ jobs:
                     location=${{ env.AZURE_LOCATION }}
                     storageAccountName=${{ env.DNETBOT_NAME }}storage
                     use32BitWorkerProcess=false
+                    cacheName=${{ env.DNETBOT_NAME }}-cache
 
             # Deploy WebApp Resources
           - name: 'Deploy Azure WebApp Components'
@@ -95,6 +107,7 @@ jobs:
                     workerSize=0
                     workerSizeId=0
                     numberOfWorkers=1
+                    cacheName=${{ env.DNETBOT_NAME }}-cache
 
             # Add WebApp and Function Environment Variables
           - name: 'Add Environment Variables'
