@@ -56,7 +56,7 @@
   "variables": {},
   "resources": [
     {
-      "name": "[variables('cacheName')]",
+      "name": "[parameters('cacheName')]",
       "type": "Microsoft.Cache/Redis",
       "location": "[parameters('location')]",
       "apiVersion": "2015-08-01",
