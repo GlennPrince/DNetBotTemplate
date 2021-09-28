@@ -21,7 +21,10 @@ namespace DNetUtils.Entities
         public int? UserLimit { get; set; }
         public int? RateLimit { get; set; }
         public List<ulong> Recipients { get; set; }
+        public List<ulong> CategorizedChannels { get; set; }
         public ulong? CategoryID { get; set; }
+        public string Mention { get; set; }
+        public ChannelType ChannelType { get; set; }
 
         // Basic Channel Types
         public DiscordChannel(SocketChannel channel)
@@ -62,6 +65,8 @@ namespace DNetUtils.Entities
             RateLimit = channel.SlowModeInterval;
             CategoryID = channel.CategoryId;
             NSFW = channel.IsNsfw;
+            Mention = channel.Mention;
+            ChannelType = ChannelType.Text;
         }
 
         public DiscordChannel(RestTextChannel channel)
@@ -74,6 +79,8 @@ namespace DNetUtils.Entities
             RateLimit = channel.SlowModeInterval;
             CategoryID = channel.CategoryId;
             NSFW = channel.IsNsfw;
+            Mention = channel.Mention;
+            ChannelType = ChannelType.Text;
         }
 
         // Guild Voice Channels
@@ -86,6 +93,7 @@ namespace DNetUtils.Entities
             BitRate = channel.Bitrate;
             UserLimit = channel.UserLimit;
             CategoryID = channel.CategoryId;
+            ChannelType = ChannelType.Voice;
         }
 
         public DiscordChannel(RestVoiceChannel channel)
@@ -97,6 +105,7 @@ namespace DNetUtils.Entities
             BitRate = channel.Bitrate;
             UserLimit = channel.UserLimit;
             CategoryID = channel.CategoryId;
+            ChannelType = ChannelType.Voice;
         }
 
         // DM Channels
@@ -104,12 +113,14 @@ namespace DNetUtils.Entities
         {
             ID = channel.Id;
             Recipients.Add(channel.Recipient.Id);
+            ChannelType = ChannelType.DM;
         }
 
         public DiscordChannel(RestDMChannel channel)
         {
             ID = channel.Id;
             Recipients.Add(channel.Recipient.Id);
+            ChannelType = ChannelType.DM;
         }
         // Group DM Channels
         public DiscordChannel(SocketGroupChannel channel)
@@ -118,6 +129,7 @@ namespace DNetUtils.Entities
             Name = channel.Name;
             foreach(var recipient in channel.Recipients)
                 Recipients.Add(recipient.Id);
+            ChannelType = ChannelType.Group;
         }
 
         public DiscordChannel(RestGroupChannel channel)
@@ -126,6 +138,83 @@ namespace DNetUtils.Entities
             Name = channel.Name;
             foreach (var recipient in channel.Recipients)
                 Recipients.Add(recipient.Id);
+            ChannelType = ChannelType.Group;
+        }
+
+        public DiscordChannel(SocketCategoryChannel channel)
+        {
+            ID = channel.Id;
+            Name = channel.Name;
+            foreach (var childChannel in channel.Channels)
+                CategorizedChannels.Add(childChannel.Id);
+            Position = channel.Position;
+            GuildID = channel.Guild.Id;
+            ChannelType = ChannelType.Category;
+        }
+
+        public DiscordChannel(RestCategoryChannel channel)
+        {
+            ID = channel.Id;
+            Name = channel.Name;
+            Position = channel.Position;
+            ChannelType = ChannelType.Category;
+        }
+
+        public DiscordChannel(SocketNewsChannel channel)
+        {
+            ID = channel.Id;
+            Name = channel.Name;
+            GuildID = channel.Guild.Id;
+            Name = channel.Name;
+            Position = channel.Position;
+            Topic = channel.Topic;
+            RateLimit = channel.SlowModeInterval;
+            CategoryID = channel.CategoryId;
+            NSFW = channel.IsNsfw;
+            Mention = channel.Mention;
+            ChannelType = ChannelType.News;
+        }
+
+        public DiscordChannel(RestNewsChannel channel)
+        {
+            ID = channel.Id;
+            Name = channel.Name;
+            Name = channel.Name;
+            Position = channel.Position;
+            Topic = channel.Topic;
+            RateLimit = channel.SlowModeInterval;
+            CategoryID = channel.CategoryId;
+            NSFW = channel.IsNsfw;
+            Mention = channel.Mention;
+            ChannelType = ChannelType.News;
+        }
+
+        
+
+        public DiscordChannel(string json)
+        {
+            var channel = JsonConvert.DeserializeObject<DiscordChannel>(json);
+
+            ID = channel.ID;
+            GuildID = channel.GuildID;
+            Name = channel.Name;
+            Position = channel.Position;
+            Topic = channel.Topic;
+            RateLimit = channel.RateLimit;
+            CategoryID = channel.CategoryID;
+            NSFW = channel.NSFW;
+            Mention = channel.Mention;
+
+            BitRate = channel.BitRate;
+            UserLimit = channel.UserLimit;
+
+            foreach (var childChannel in channel.CategorizedChannels)
+                CategorizedChannels.Add(childChannel);
+
+            foreach (var recipient in channel.Recipients)
+                Recipients.Add(recipient);
+
+            ChannelType = channel.ChannelType;
         }
 
         /// <summary> 

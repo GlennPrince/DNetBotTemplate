@@ -14,7 +14,8 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User Information Updated For: " + newUser.Id);
             var serializedUser = new DiscordUser(newUser).ToString();
-            return SendEvent("user", "UpdatedUser", "DNetBot.User.Updated", serializedUser);
+            cachedData.StringSet("user:" + newUser.Id.ToString(), serializedUser);
+            return SendEvent("user", "UpdatedUser", "DNetBot.User.Updated", newUser.Id.ToString());
         }
 
         // Handles any actions when a members details or presence is updated
@@ -22,7 +23,8 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "Member Information Updated For: " + newUser.Id);
             var serializedUser = new DiscordUser(newUser).ToString();
-            return SendEvent("user", "UpdatedMember", "DNetBot.User.Updated", serializedUser);
+            cachedData.StringSet("user:" + newUser.Id.ToString(), serializedUser);
+            return SendEvent("user", "UpdatedMember", "DNetBot.User.Updated", newUser.Id.ToString());
         }
 
         // Handles any actions when a user joins a server
@@ -30,7 +32,8 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " joined Server: " + user.Guild.Id);
             var serializedUser = new DiscordUser(user).ToString();
-            return SendEvent("user", "UserJoined", "DNetBot.User.Joined", serializedUser);
+            cachedData.StringSet("guild_users:" + user.Guild.Id + ":" + user.Id.ToString(), serializedUser);
+            return SendEvent("user", "UserJoined", "DNetBot.User.Joined", user.Guild.Id + ":" + user.Id.ToString());
         }
 
         // Handles any actions when a user leaves a server
@@ -38,21 +41,24 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left Server: " + user.Guild.Id);
             var serializedUser = new DiscordUser(user).ToString();
-            return SendEvent("user", "UserLeft", "DNetBot.User.Left", serializedUser);
+            cachedData.KeyDelete("guild_users:" + user.Guild.Id + ":" + user.Id.ToString());
+            return SendEvent("user", "UserLeft", "DNetBot.User.Left", user.Guild.Id + ":" + user.Id.ToString());
         }
 
         private Task PrivateGroupAdd(SocketGroupUser user)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left Server: " + user.Channel.Id);
             var serializedUser = new DiscordUser(user).ToString();
-            return SendEvent("user", "PrivateGroupAdd", "DNetBot.Group.Add", serializedUser);
+            cachedData.StringSet("private_users:" + user.Channel.Id + ":" + user.Id.ToString(), serializedUser);
+            return SendEvent("user", "PrivateGroupAdd", "DNetBot.Group.Add", user.Channel.Id + ":" + user.Id.ToString());
         }
 
         private Task PrivateGroupRemove(SocketGroupUser user)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left private group: " + user.Channel.Id);
             var serializedUser = new DiscordUser(user).ToString();
-            return SendEvent("user", "PrivateGroupRemove", "DNetBot.Group.Remove", serializedUser);
+            cachedData.KeyDelete("private_users:" + user.Channel.Id + ":" + user.Id.ToString());
+            return SendEvent("user", "PrivateGroupRemove", "DNetBot.Group.Remove", user.Channel.Id + ":" + user.Id.ToString());
         }
     }
 }

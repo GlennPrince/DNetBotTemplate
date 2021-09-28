@@ -3,10 +3,7 @@ using Discord.WebSocket;
 using DNetBot.Helpers;
 using DNetUtils.Entities;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using System;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DNetBot.Services
@@ -18,37 +15,38 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "New Message From : " + message.Source.ToString() + " | Message Content: " + message.Content);
             var serializedMessage = new DiscordMessage(message).ToString();
-            return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", serializedMessage);
+            cachedData.StringSet("message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString(), serializedMessage);
+            return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", message.Channel.Id.ToString() + ":" + message.Id.ToString());
         }
 
         private Task DeletedMessage(ulong messageId, ISocketMessageChannel channel)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Message Deleted From Channel ID : " + channel.Id.ToString() + " | Message Id: " + messageId);
-            var newMessage = new DiscordMessage();
-            newMessage.ChannelId = channel.Id;
-            newMessage.MessageId = messageId;
-            return SendEvent("messages", "DeletedMessage", "DNetBot.Message.Deleted", newMessage.ToString());
+            cachedData.KeyDelete("message:" + channel.Id.ToString() + ":" + messageId.ToString());
+            return SendEvent("messages", "DeletedMessage", "DNetBot.Message.Deleted", channel.Id.ToString() + ":" + messageId.ToString());
         }
 
         private Task UpdatedMessage(ulong messageId, SocketMessage message, ISocketMessageChannel channel)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Message Updated From Channel ID : " + channel.Id.ToString() + " | Message Content: " + message.Content);
             var serializedMessage = new DiscordMessage(message).ToString();
-            return SendEvent("messages", "UpdatedMessage", "DNetBot.Message.Updated", serializedMessage.ToString());
+            cachedData.StringSet("message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString(), serializedMessage);
+            return SendEvent("messages", "UpdatedMessage", "DNetBot.Message.Updated", message.Channel.Id.ToString() + ":" + message.Id.ToString());
         }
 
         private Task ReactionAdded(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reaction Added to Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
             var serializedReaction = reaction.ToString();
-            return SendEvent("reaction", "AddReaction", "DNetBot.Reaction.Add", serializedReaction);
+            cachedData.StringSet("message_reaction:" + message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name, serializedReaction);
+            return SendEvent("reaction", "AddReaction", "DNetBot.Reaction.Add", message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name);
         }
 
         private Task ReactionRemoved(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reaction Removed off Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
-            var serializedReaction = reaction.ToString();
-            return SendEvent("reaction", "RemoveReaction", "DNetBot.Reaction.Delete", serializedReaction);
+            cachedData.KeyDelete("message_reaction:" + message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name);
+            return SendEvent("reaction", "RemoveReaction", "DNetBot.Reaction.Delete", message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name);
         }
 
         private Task ReactionCleared(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel)

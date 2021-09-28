@@ -56,6 +56,23 @@ namespace DNetUtils.Entities
             IsMentionable = role.IsMentionable;
         }
 
+        public DiscordRole(string json)
+        {
+            var role = JsonConvert.DeserializeObject<DiscordRole>(json);
+
+            ID = role.ID;
+            Name = role.Name;
+            Color = role.Color;
+            Permissions = role.Permissions;
+            Mention = role.Mention;
+            Position = role.Position;
+
+            IsEveryone = role.IsEveryone;
+            IsManaged = role.IsManaged;
+            IsMentionable = role.IsMentionable;
+
+        }
+
         /// <summary> 
         /// Returns the Role as a JSON formatted string
         /// </summary>

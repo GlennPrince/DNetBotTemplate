@@ -18,6 +18,16 @@ namespace DNetUtils.Entities
             EmoteName = reaction.Emote.Name;
         }
 
+        public DiscordReaction(string json)
+        {
+            var reaction = JsonConvert.DeserializeObject<DiscordReaction>(json);
+
+            MessageID = reaction.MessageID;
+            UserID = reaction.UserID;
+            ChannelId = reaction.ChannelId;
+            EmoteName = reaction.EmoteName;
+        }
+
         /// <summary> 
         /// Returns the Reaction as a JSON formatted string
         /// </summary>

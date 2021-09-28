@@ -112,6 +112,35 @@ namespace DNetUtils.Entities
                 AttachmentIDs.Add(attachment.Id);
         }
 
+        public DiscordMessage(string json)
+        {
+            var message = JsonConvert.DeserializeObject<DiscordMessage>(json);
+
+            MessageId = message.MessageId;
+            AuthorId = message.AuthorId;
+            ChannelId = message.ChannelId;
+            Source = message.Source;
+            Content = message.Content;
+            CreatedAt = message.CreatedAt;
+            IsPinned = message.IsPinned;
+
+            MentionedChannelIDs = new List<ulong>();
+            foreach (var channel in message.MentionedChannelIDs)
+                MentionedChannelIDs.Add(channel);
+
+            MentionedRoleIDs = new List<ulong>();
+            foreach (var role in message.MentionedRoleIDs)
+                MentionedRoleIDs.Add(role);
+
+            MentionedUserIDs = new List<ulong>();
+            foreach (var user in message.MentionedUserIDs)
+                MentionedUserIDs.Add(user);
+
+            AttachmentIDs = new List<ulong>();
+            foreach (var attachment in message.AttachmentIDs)
+                AttachmentIDs.Add(attachment);
+        }
+
         /// <summary> 
         /// Returns the Message as a JSON formatted string
         /// </summary>

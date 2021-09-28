@@ -246,10 +246,10 @@ namespace DNetUtils.Entities
 
             AFKTimeout = guild.AFKTimeout;
             IsEmbeddable = guild.IsEmbeddable;
-            DefaultMessageNotifications = (int)guild.DefaultMessageNotifications;
-            ExplicitContentFilter = (int)guild.ExplicitContentFilter;
-            MfaLevel = (int)guild.MfaLevel;
-            VerificationLevel = (int)guild.VerificationLevel;
+            DefaultMessageNotifications = guild.DefaultMessageNotifications;
+            ExplicitContentFilter = guild.ExplicitContentFilter;
+            MfaLevel = guild.MfaLevel;
+            VerificationLevel = guild.VerificationLevel;
 
             ApplicationId = guild.ApplicationId;
             OwnerId = guild.OwnerId;

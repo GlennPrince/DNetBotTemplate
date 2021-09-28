@@ -32,6 +32,19 @@ namespace DNetUtils.Entities
                 Width = 0;
         }
 
+        public DiscordAttachment(string json)
+        {
+            var attachment = JsonConvert.DeserializeObject<DiscordAttachment>(json);
+
+            ID = attachment.ID;
+            FileName = attachment.FileName;
+            Url = attachment.Url;
+            ProxyUrl = attachment.ProxyUrl;
+            Size = attachment.Size;
+            Height = attachment.Height;
+            Width = attachment.Width;
+        }
+
         /// <summary> 
         /// Returns the Attachment as a JSON formatted string
         /// </summary>
