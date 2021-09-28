@@ -20,7 +20,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Bot Updated - " + newBot.ToString());
             var botDetails = new DiscordUser(newBot).ToString();
             cachedData.StringSet("bot:" + newBot.Id.ToString(), botDetails);
-            return SendEvent("bot", "Update", "DNetBot.Bot.Update", newBot.Id.ToString());
+            return SendEvent("bot", "Update", "DNetBot.Bot.Update", "bot:" + newBot.Id.ToString());
         }
 
         private Task LoggedIn()

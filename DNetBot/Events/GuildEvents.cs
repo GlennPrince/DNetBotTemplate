@@ -16,7 +16,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Joined Guild: " + guild.Id);
             var serializedGuild = new DiscordGuild(guild).ToString();
             cachedData.StringSet("guild:" + guild.Id.ToString(), serializedGuild);
-            return SendEvent("guild", "JoinedGuild", "DNetBot.Guild.Joined", guild.Id.ToString());
+            return SendEvent("guild", "JoinedGuild", "DNetBot.Guild.Joined", "guild:" + guild.Id.ToString());
         }
 
         // Handles the bot being initially removed from a guild / server
@@ -24,7 +24,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Left Guild: " + guild.Id);
             cachedData.KeyDelete("guild:" + guild.Id.ToString());
-            return SendEvent("guild", "LeftGuild", "DNetBot.Guild.Left", guild.Id.ToString());
+            return SendEvent("guild", "LeftGuild", "DNetBot.Guild.Left", "guild:" + guild.Id.ToString());
         }
         #endregion
 
@@ -35,7 +35,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Became Available: " + guild.Id);
             var serializedGuild = new DiscordGuild(guild).ToString();
             cachedData.StringSet("guild:" + guild.Id.ToString(), serializedGuild);
-            return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", guild.Id.ToString());
+            return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", "guild:" + guild.Id.ToString());
         }
 
         // Handles any actions required if the guild updates it's details
@@ -44,7 +44,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Updated: " + newGuild.Id);
             var serializedGuild = new DiscordGuild(newGuild).ToString();
             cachedData.StringSet("guild:" + newGuild.Id.ToString(), serializedGuild);
-            return SendEvent("guild", "UpdatedGuild", "DNetBot.Guild.Updated", newGuild.Id.ToString());
+            return SendEvent("guild", "UpdatedGuild", "DNetBot.Guild.Updated", "guild:" + newGuild.Id.ToString());
         }
 
         // Handles processes for when a guild becomes unavailable
@@ -52,7 +52,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Became Unavailable: " + guild.Id);
             cachedData.KeyDelete("guild:" + guild.Id.ToString());
-            return SendEvent("guild", "GuildUnavailable", "DNetBot.Guild.Unavailable", guild.Id.ToString());
+            return SendEvent("guild", "GuildUnavailable", "DNetBot.Guild.Unavailable", "guild:" + guild.Id.ToString());
         }
         #endregion
 
@@ -63,7 +63,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "Channel Created: " + channel.Id);
             var serializedChannel = new DiscordChannel(channel).ToString();
             cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
-            return SendEvent("channel", "ChannelCreated", "DNetBot.Channel.Created", channel.Id.ToString());
+            return SendEvent("channel", "ChannelCreated", "DNetBot.Channel.Created", "channel:" + channel.Id.ToString());
         }
 
         // Handles actions for when a guild updates a channel
@@ -72,7 +72,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "Channel Updated: " + newChannel.Id);
             var serializedChannel = new DiscordChannel(newChannel).ToString();
             cachedData.StringSet("channel:" + newChannel.Id.ToString(), serializedChannel);
-            return SendEvent("channel", "ChannelUpdated", "DNetBot.Channel.Updated", newChannel.Id.ToString());
+            return SendEvent("channel", "ChannelUpdated", "DNetBot.Channel.Updated", "channel:" + newChannel.Id.ToString());
         }
 
         // Handles actions for when a guild deletes a channel
@@ -80,7 +80,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "Channel Deleted: " + channel.Id);
             cachedData.KeyDelete("channel:" + channel.Id.ToString());
-            return SendEvent("channel", "ChannelDeleted", "DNetBot.Channel.Deleted", channel.Id.ToString());
+            return SendEvent("channel", "ChannelDeleted", "DNetBot.Channel.Deleted", "channel:" + channel.Id.ToString());
         }
 
         // Handles actions for when a user joins a channel
@@ -89,7 +89,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "User: " + user.Id + " Joined Channel: " + user.Channel.Id);
             var serializedUser = new DiscordUser(user).ToString();
             cachedData.StringSet("channel_users:" + user.Channel.Id.ToString() + ":" + user.Id.ToString(), serializedUser);
-            return SendEvent("channel", "ChannelJoined", "DNetBot.Channel.Joined", user.Id.ToString() + ":" + user.Channel.Id.ToString());
+            return SendEvent("channel", "ChannelJoined", "DNetBot.Channel.Joined", "channel_users:" + user.Id.ToString() + ":" + user.Channel.Id.ToString());
         }
 
         // Handles actions for when a user leaves a channel
@@ -97,7 +97,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "User: " + user.Id + " Left Channel: " + user.Channel.Id);
             cachedData.KeyDelete("channel_users:" + user.Channel.Id.ToString() + ":" + user.Id.ToString());
-            return SendEvent("channel", "ChannelLeft", "DNetBot.Channel.Left", user.Id.ToString() + ":" + user.Channel.Id.ToString());
+            return SendEvent("channel", "ChannelLeft", "DNetBot.Channel.Left", "channel_users:" + user.Id.ToString() + ":" + user.Channel.Id.ToString());
         }
         #endregion
 
@@ -108,7 +108,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Created: " + role.Id);
             var serializedRole = new DiscordRole(role).ToString();
             cachedData.StringSet("role:" + role.Id.ToString(), serializedRole);
-            return SendEvent("role", "RoleCreated", "DNetBot.Role.Created", role.Id.ToString());
+            return SendEvent("role", "RoleCreated", "DNetBot.Role.Created", ("role:" + role.Id.ToString());
         }
 
         // Handles actions for when a guild updates a role
@@ -117,7 +117,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Updated: " + newRole.Id);
             var serializedRole = new DiscordRole(newRole).ToString();
             cachedData.StringSet("role:" + newRole.Id.ToString(), serializedRole);
-            return SendEvent("role", "RoleUpdated", "DNetBot.Role.Updated", newRole.Id.ToString());
+            return SendEvent("role", "RoleUpdated", "DNetBot.Role.Updated", ("role:" + newRole.Id.ToString());
         }
 
         // Handles actions for when a guild deletes a role
@@ -125,7 +125,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Deleted: " + role.Id);
             cachedData.KeyDelete("role:" + role.Id.ToString());
-            return SendEvent("role", "RoleDeleted", "DNetBot.Role.Deleted", role.Id.ToString());
+            return SendEvent("role", "RoleDeleted", "DNetBot.Role.Deleted", ("role:" + role.Id.ToString());
         }
         #endregion
 
@@ -135,7 +135,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "User: " + user.Id + " Banned From: " + guild.Id);
             var serializedUser = new DiscordUser(user).ToString();
             cachedData.StringSet("banned_users:" + guild.Id.ToString() + ":" + user.Id.ToString(), serializedUser);
-            return SendEvent("user", "UserBanned", "DNetBot.User.Banned", user.Id.ToString() + ":" + guild.Id.ToString());
+            return SendEvent("user", "UserBanned", "DNetBot.User.Banned", "banned_users:" + user.Id.ToString() + ":" + guild.Id.ToString());
         }
 
 
@@ -143,7 +143,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "User: " + user.Id + " Unbanned From: " + guild.Id);
             cachedData.KeyDelete("banned_users:" + guild.Id.ToString() + ":" + user.Id.ToString());
-            return SendEvent("user", "UserUnbanned", "DNetBot.User.Unbanned", user.Id.ToString() + ":" + guild.Id.ToString());
+            return SendEvent("user", "UserUnbanned", "DNetBot.User.Unbanned", "banned_users:" + user.Id.ToString() + ":" + guild.Id.ToString());
         }
         #endregion
     }

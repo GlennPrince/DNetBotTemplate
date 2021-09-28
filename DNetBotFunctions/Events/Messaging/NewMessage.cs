@@ -32,8 +32,19 @@ namespace DNetBotFunctions.Events.Messaging
             log.LogInformation("New Message Event Triggered On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
             //var message = JsonConvert.DeserializeObject<DiscordMessage>(eventGridEvent.Data.ToString());
 
+            var status = _redis.GetStatus();
             IDatabase cache = _redis.GetDatabase();
             var cachedMessage = cache.StringGet(eventGridEvent.Data.ToString());
+
+            cache.StringSet("TestKey", eventGridEvent.Data.ToString());
+
+            var test = cache.StringGet("guild:765590399066439700");
+
+            if(!cachedMessage.HasValue)
+            {
+                log.LogError("Could not retrieve cached value");
+                return;
+            }
 
             var message = new DiscordMessage(cachedMessage);
 
