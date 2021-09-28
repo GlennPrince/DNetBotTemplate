@@ -11,15 +11,18 @@ using DNetUtils.Entities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using DNetBotFunctions.Clients;
+using StackExchange.Redis;
 
 namespace DNetBotFunctions.Events.Guild
 {
-    public static class GuildJoin
+    public class GuildJoin
     {
-        private static EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+        private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+        private IConnectionMultiplexer _redis;
+        public GuildJoin(IConnectionMultiplexer redis) { _redis = redis; }
 
         [FunctionName("GuildJoin")]
-        public static void Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
+        public void Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
         {
             if (eventGridEvent.Subject.Equals("JoinedGuild") && eventGridEvent.EventType.Equals("DNetBot.Guild.Joined"))
             {

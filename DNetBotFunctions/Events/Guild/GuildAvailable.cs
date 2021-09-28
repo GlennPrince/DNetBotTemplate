@@ -10,22 +10,26 @@ using Microsoft.Azure.EventGrid;
 using DNetBotFunctions.Clients;
 using DNetUtils.Entities;
 using System.Collections.Generic;
+using StackExchange.Redis;
 
 namespace DNetBotFunctions.Events.Guild
 {
-    public static class GuildAvailable
+    public class GuildAvailable
     {
-        private static EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+        private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+
+        private IConnectionMultiplexer _redis;
+        public GuildAvailable(IConnectionMultiplexer redis) { _redis = redis; }
 
         [FunctionName("GuildAvailable")]
-        public static void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
+        public void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
         {
             if (eventGridEvent.Subject.Equals("GuildAvailable") && eventGridEvent.EventType.Equals("DNetBot.Guild.Available"))
             {
                 log.LogInformation("Guild Joined Event Triggered On: {Topic} with the Subject: {Subject} and the ID: {GuildID}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString(), eventGridEvent.Data.ToString());
-
-                var guild = RedisCacheClient.RetrieveGuild(eventGridEvent.Data.ToString());
-                log.LogInformation("Raw Guild: " + RedisCacheClient.testGuild(eventGridEvent.Data.ToString()));
+                
+                IDatabase cache = _redis.GetDatabase();
+                var guild = new DiscordGuild(cache.StringGet(eventGridEvent.Data.ToString()));
 
                 log.LogInformation("Guild Info: " + guild.Name);
                 

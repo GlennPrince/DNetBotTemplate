@@ -11,20 +11,31 @@ using Microsoft.Azure.EventGrid;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using DNetBotFunctions.Clients;
+using StackExchange.Redis;
 
 namespace DNetBotFunctions.Events.Messaging
 {
-    public static class NewMessage
+    public class NewMessage
     {
-        private static EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+        private IConnectionMultiplexer _redis;
+
+        public NewMessage(IConnectionMultiplexer redis)
+        {
+            _redis = redis;
+        }
+
+        private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
 
         [FunctionName("NewMessage")]
-        public static void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
+        public void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
         {
             log.LogInformation("New Message Event Triggered On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
             //var message = JsonConvert.DeserializeObject<DiscordMessage>(eventGridEvent.Data.ToString());
 
-            var message = RedisCacheClient.RetrieveMessage(eventGridEvent.Data.ToString());
+            IDatabase cache = _redis.GetDatabase();
+            var cachedMessage = cache.StringGet(eventGridEvent.Data.ToString());
+
+            var message = new DiscordMessage(cachedMessage);
 
             if (message.Content.StartsWith("!ping"))
             {
