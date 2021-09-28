@@ -13,7 +13,7 @@ namespace DNetBotFunctions.Clients
         {
             string cacheConnection = System.Environment.GetEnvironmentVariable("RedisServer").ToString();
             //var connection = ConnectionMultiplexer.Connect(cacheConnection.ToString());
-            return ConnectionMultiplexer.Connect("localhost:6379,password=mylocalredispassword,ssl=false");
+            return ConnectionMultiplexer.Connect(cacheConnection);
         }, LazyThreadSafetyMode.PublicationOnly);
 
         private static ConnectionMultiplexer Connection
@@ -21,6 +21,18 @@ namespace DNetBotFunctions.Clients
             get
             {
                 return redisConnection.Value;
+            }
+        }
+
+        public static DiscordMessage RetrieveMessage(string messageId)
+        {
+            var cachedMessage = (string)Connection.GetDatabase().StringGet(messageId);
+            if (string.IsNullOrEmpty(cachedMessage))
+                return new DiscordMessage();
+            else
+            {
+                var message = new DiscordMessage(cachedMessage);
+                return message;
             }
         }
 

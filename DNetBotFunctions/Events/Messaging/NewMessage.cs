@@ -10,6 +10,7 @@ using DNetUtils.Entities;
 using Microsoft.Azure.EventGrid;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using DNetBotFunctions.Clients;
 
 namespace DNetBotFunctions.Events.Messaging
 {
@@ -21,7 +22,9 @@ namespace DNetBotFunctions.Events.Messaging
         public static void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
         {
             log.LogInformation("New Message Event Triggered On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
-            var message = JsonConvert.DeserializeObject<DiscordMessage>(eventGridEvent.Data.ToString());
+            //var message = JsonConvert.DeserializeObject<DiscordMessage>(eventGridEvent.Data.ToString());
+
+            var message = RedisCacheClient.RetrieveMessage(eventGridEvent.Data.ToString());
 
             if (message.Content.StartsWith("!ping"))
             {
