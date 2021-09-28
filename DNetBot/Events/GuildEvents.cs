@@ -108,7 +108,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Created: " + role.Id);
             var serializedRole = new DiscordRole(role).ToString();
             cachedData.StringSet("role:" + role.Id.ToString(), serializedRole);
-            return SendEvent("role", "RoleCreated", "DNetBot.Role.Created", ("role:" + role.Id.ToString());
+            return SendEvent("role", "RoleCreated", "DNetBot.Role.Created", "role:" + role.Id.ToString());
         }
 
         // Handles actions for when a guild updates a role
@@ -117,7 +117,7 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Updated: " + newRole.Id);
             var serializedRole = new DiscordRole(newRole).ToString();
             cachedData.StringSet("role:" + newRole.Id.ToString(), serializedRole);
-            return SendEvent("role", "RoleUpdated", "DNetBot.Role.Updated", ("role:" + newRole.Id.ToString());
+            return SendEvent("role", "RoleUpdated", "DNetBot.Role.Updated", "role:" + newRole.Id.ToString());
         }
 
         // Handles actions for when a guild deletes a role
@@ -125,7 +125,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Deleted: " + role.Id);
             cachedData.KeyDelete("role:" + role.Id.ToString());
-            return SendEvent("role", "RoleDeleted", "DNetBot.Role.Deleted", ("role:" + role.Id.ToString());
+            return SendEvent("role", "RoleDeleted", "DNetBot.Role.Deleted", "role:" + role.Id.ToString());
         }
         #endregion
 
