@@ -18,8 +18,10 @@ namespace DNetBot.Services
         private Task BotUpdated(SocketSelfUser oldBot, SocketSelfUser newBot)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Self", "Bot Updated - " + newBot.ToString());
+
             var botDetails = new DiscordUser(newBot).ToString();
             cachedData.StringSet("bot:" + newBot.Id.ToString(), botDetails);
+
             return SendEvent("bot", "Update", "DNetBot.Bot.Update", "bot:" + newBot.Id.ToString());
         }
 

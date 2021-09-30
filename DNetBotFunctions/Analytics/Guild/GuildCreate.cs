@@ -1,3 +1,4 @@
+
 // Default URL for triggering event grid function in the local environment.
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName=Analytics_GuildCreate
 using System;
@@ -31,23 +32,44 @@ namespace DNetBotFunctions.Analytics.Guild
         [FunctionName("Analytics_GuildCreate")]
         public async void Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
         {
-            if (eventGridEvent.Subject.Equals("JoinedGuild") && eventGridEvent.EventType.Equals("DNetBot.Guild.Joined"))
-            {
-                log.LogInformation(new EventId(1, "GuildJoin"), "Analytics Guild Create Service triggered from Guild Joined Event On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
-                var guild = JsonConvert.DeserializeObject<DiscordGuild>(eventGridEvent.Data.ToString());
-                
-                var storeGuild = new GuildTableEntity(guild.Id.ToString(), "Guild.Info", guild);
-                _dataStore.InsertOrMergeObject("AnalyticsGuilds", storeGuild);
+            log.LogInformation(new EventId(1, "GuildJoin"), "Analytics Guild Create Service triggered from Guild Joined Event On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
 
-                foreach (var channel in guild.ChannelIds)
-                {
-                    var storeChannel = new ChannelTableEntity(guild.Id.ToString(), channel.ToString(), guild.Id, channel);
-                    _dataStore.InsertOrMergeObject("AnalyticsChannels", storeChannel);
-                }
-            }
-            else
+            IDatabase cache = _redis.GetDatabase();
+            var cachedGuild = cache.StringGet("guild:" + eventGridEvent.Data.ToString());
+
+            var guild = JsonConvert.DeserializeObject<DiscordGuild>(cachedGuild);
+                
+            var storeGuild = new GuildTableEntity(guild.Id.ToString(), "Guild.Info", guild);
+            _dataStore.InsertOrMergeObject("AnalyticsGuilds", storeGuild);
+
+            foreach (var channelID in guild.ChannelIds)
             {
-                // We could do something if the event is not the type we are expecting
+                var cachedChannel = cache.StringGet("channel:" + channelID.ToString());
+                var channel = JsonConvert.DeserializeObject<DiscordChannel>(cachedChannel);
+                var storeChannel = new ChannelTableEntity(guild.Id.ToString(), channel.ToString(), channel);
+                _dataStore.InsertOrMergeObject("AnalyticsChannels", storeChannel);
+
+                if(guild.CategoryIds.Contains(channelID))
+                    _dataStore.InsertOrMergeObject("AnalyticsCategoryChannels", storeChannel);
+
+                if (guild.VoiceIds.Contains(channelID))
+                    _dataStore.InsertOrMergeObject("AnalyticsVoiceChannels", storeChannel);
+            }
+
+            foreach (var roleID in guild.RoleIds)
+            {
+                var cachedRole = cache.StringGet("role:" + guild.Id.ToString() + ":" + roleID.ToString());
+                var role = JsonConvert.DeserializeObject<DiscordRole>(cachedRole);
+                var storeRole = new RoleTableEntity(guild.Id.ToString(), role.ToString(), role);
+                _dataStore.InsertOrMergeObject("AnalyticsRoles", storeRole);
+            }
+
+            foreach (var emoteID in guild.EmoteIds)
+            {
+                var cachedEmote = cache.StringGet("emote:" + guild.Id.ToString() + ":" + emoteID.ToString());
+                var emote = JsonConvert.DeserializeObject<DiscordEmote>(cachedEmote);
+                var storeEmote = new EmoteTableEntity(guild.Id.ToString(), emoteID.ToString(), emote);
+                _dataStore.InsertOrMergeObject("AnalyticsEmotes", storeEmote);
             }
         }
     }

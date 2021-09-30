@@ -19,8 +19,26 @@ namespace DNetBot.Services
 
             foreach(var channel in guild.Channels)
             {
-                var serializedChannel = new DiscordChannel(channel).ToString();
+                var fullChannel = discordClient.GetChannel(channel.Id);
+                var serializedChannel = new DiscordChannel(fullChannel).ToString();
                 cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
+            }
+
+            string features = "";
+            foreach (var feature in guild.Features)
+                features += feature + ";";
+            cachedData.StringSet("feature:" + guild.Id.ToString(), features);
+
+            foreach (var role in guild.Roles)
+            {
+                var serializedRole = new DiscordRole(role).ToString();
+                cachedData.StringSet("role:" + guild.Id.ToString() + ":" + role.Id.ToString(), serializedRole);
+            }
+
+            foreach (var emote in guild.Emotes)
+            {
+                var serializedEmote = new DiscordEmote(emote).ToString();
+                cachedData.StringSet("emote:" + guild.Id.ToString() + ":" + emote.Id.ToString(), serializedEmote);
             }
 
             return SendEvent("guild", "JoinedGuild", "DNetBot.Guild.Joined", "guild:" + guild.Id.ToString());
@@ -31,6 +49,18 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Left Guild: " + guild.Id);
             cachedData.KeyDelete("guild:" + guild.Id.ToString());
+
+            foreach (var channel in guild.Channels)
+                cachedData.KeyDelete("channel:" + channel.Id.ToString());
+
+            cachedData.KeyDelete("feature:" + guild.Id.ToString());
+
+            foreach (var role in guild.Roles)
+                cachedData.KeyDelete("role:" + guild.Id.ToString() + ":" + role.Id.ToString());
+
+            foreach (var emote in guild.Emotes)
+                cachedData.KeyDelete("emote:" + guild.Id.ToString() + ":" + emote.Id.ToString());
+
             return SendEvent("guild", "LeftGuild", "DNetBot.Guild.Left", "guild:" + guild.Id.ToString());
         }
         #endregion
@@ -45,8 +75,26 @@ namespace DNetBot.Services
 
             foreach (var channel in guild.Channels)
             {
-                var serializedChannel = new DiscordChannel(channel).ToString();
+                var fullChannel = discordClient.GetChannel(channel.Id);
+                var serializedChannel = new DiscordChannel(fullChannel).ToString();
                 cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
+            }
+
+            string features = "";
+            foreach (var feature in guild.Features)
+                features += feature + ";";
+            cachedData.StringSet("feature:" + guild.Id.ToString(), features);
+
+            foreach (var role in guild.Roles)
+            {
+                var serializedRole = new DiscordRole(role).ToString();
+                cachedData.StringSet("role:" + guild.Id.ToString() + ":" + role.Id.ToString(), serializedRole);
+            }
+
+            foreach (var emote in guild.Emotes)
+            {
+                var serializedEmote = new DiscordEmote(emote).ToString();
+                cachedData.StringSet("emote:" + guild.Id.ToString() + ":" + emote.Id.ToString(), serializedEmote);
             }
 
             return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", "guild:" + guild.Id.ToString());
@@ -58,6 +106,31 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Updated: " + newGuild.Id);
             var serializedGuild = new DiscordGuild(newGuild).ToString();
             cachedData.StringSet("guild:" + newGuild.Id.ToString(), serializedGuild);
+
+            foreach (var channel in newGuild.Channels)
+            {
+                var fullChannel = discordClient.GetChannel(channel.Id);
+                var serializedChannel = new DiscordChannel(fullChannel).ToString();
+                cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
+            }
+
+            string features = "";
+            foreach (var feature in newGuild.Features)
+                features += feature + ";";
+            cachedData.StringSet("feature:" + newGuild.Id.ToString(), features);
+
+            foreach (var role in newGuild.Roles)
+            {
+                var serializedRole = new DiscordRole(role).ToString();
+                cachedData.StringSet("role:" + newGuild.Id.ToString() + ":" + role.Id.ToString(), serializedRole);
+            }
+
+            foreach (var emote in newGuild.Emotes)
+            {
+                var serializedEmote = new DiscordEmote(emote).ToString();
+                cachedData.StringSet("emote:" + newGuild.Id.ToString() + ":" + emote.Id.ToString(), serializedEmote);
+            }
+
             return SendEvent("guild", "UpdatedGuild", "DNetBot.Guild.Updated", "guild:" + newGuild.Id.ToString());
         }
 
@@ -122,6 +195,13 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Created: " + role.Id);
             var serializedRole = new DiscordRole(role).ToString();
             cachedData.StringSet("role:" + role.Id.ToString(), serializedRole);
+
+            foreach (var member in role.Members)
+            {
+                var serializedMember = new DiscordUser(member).ToString();
+                cachedData.StringSet("role_members:" + role.Id.ToString() + ":" + member.Id.ToString(), serializedMember);
+            }
+
             return SendEvent("role", "RoleCreated", "DNetBot.Role.Created", "role:" + role.Id.ToString());
         }
 
@@ -131,6 +211,13 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Updated: " + newRole.Id);
             var serializedRole = new DiscordRole(newRole).ToString();
             cachedData.StringSet("role:" + newRole.Id.ToString(), serializedRole);
+
+            foreach (var member in newRole.Members)
+            {
+                var serializedMember = new DiscordUser(member).ToString();
+                cachedData.StringSet("role_members:" + newRole.Id.ToString() + ":" + member.Id.ToString(), serializedMember);
+            }
+
             return SendEvent("role", "RoleUpdated", "DNetBot.Role.Updated", "role:" + newRole.Id.ToString());
         }
 
@@ -139,6 +226,12 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Role", "Role Deleted: " + role.Id);
             cachedData.KeyDelete("role:" + role.Id.ToString());
+
+            foreach (var member in role.Members)
+            {
+                cachedData.KeyDelete("role_members:" + role.Id.ToString() + ":" + member.Id.ToString());
+            }
+
             return SendEvent("role", "RoleDeleted", "DNetBot.Role.Deleted", "role:" + role.Id.ToString());
         }
         #endregion
