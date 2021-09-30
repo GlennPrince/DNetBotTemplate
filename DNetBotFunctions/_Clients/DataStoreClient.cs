@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
+using System;
 using System.Threading.Tasks;
 
 namespace DNetBotFunctions.Clients
@@ -6,7 +7,13 @@ namespace DNetBotFunctions.Clients
     public class DataStoreClient
     {
         private CloudTableClient _tableClient;
-        public DataStoreClient(CloudTableClient tableClient) { _tableClient = tableClient; }
+        CloudStorageAccount _storageAccount;
+
+        public DataStoreClient() 
+        {
+            _storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
+            _tableClient = _storageAccount.CreateCloudTableClient(new TableClientConfiguration()); 
+        }
 
         public async Task<CloudTable> RetrieveTableAsync(string tableName)
         {

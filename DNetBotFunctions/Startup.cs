@@ -17,10 +17,8 @@ namespace DNetBotFunctions
         {
             var configuration = builder.GetContext().Configuration;
             string cacheConnection = configuration.GetValue<string>("RedisServer");
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(configuration.GetValue<string>("AzureWebJobsStorage"));
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(cacheConnection));
-            builder.Services.AddSingleton(storageAccount.CreateCloudTableClient(new TableClientConfiguration()));
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

@@ -12,16 +12,19 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using DNetBotFunctions.Clients;
 using StackExchange.Redis;
+using DNetBotFunctions.Analytics.Data;
 
 namespace DNetBotFunctions.Events.Messaging
 {
     public class Testing_PingTest
     {
         private IConnectionMultiplexer _redis;
+        private DataStoreClient _dataStore;
 
         public Testing_PingTest(IConnectionMultiplexer redis)
         {
             _redis = redis;
+            _dataStore = new DataStoreClient();
         }
 
         private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
@@ -34,13 +37,16 @@ namespace DNetBotFunctions.Events.Messaging
             IDatabase cache = _redis.GetDatabase();
             var cachedMessage = cache.StringGet(eventGridEvent.Data.ToString());
 
-            if(!cachedMessage.HasValue)
+            if (!cachedMessage.HasValue)
             {
                 log.LogError("Could not retrieve cached value");
                 return;
             }
 
             var message = new DiscordMessage(cachedMessage);
+
+            var storeMessage = new MessageTableEntity(message.ChannelId.ToString(), message.MessageId.ToString(), message);
+            _dataStore.InsertOrMergeObject("AnalyticsMessage", storeMessage);
 
             if (message.Content.StartsWith("!ping"))
             {

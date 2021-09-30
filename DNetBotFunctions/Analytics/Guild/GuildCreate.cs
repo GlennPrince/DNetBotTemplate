@@ -22,10 +22,10 @@ namespace DNetBotFunctions.Analytics.Guild
 
         private IConnectionMultiplexer _redis;
         private DataStoreClient _dataStore;
-        public Analytics_GuildCreate(IConnectionMultiplexer redis, DataStoreClient dataStore) 
+        public Analytics_GuildCreate(IConnectionMultiplexer redis) 
         { 
             _redis = redis;
-            _dataStore = dataStore;
+            _dataStore = new DataStoreClient();
         }
 
         [FunctionName("Analytics_GuildCreate")]
@@ -33,16 +33,16 @@ namespace DNetBotFunctions.Analytics.Guild
         {
             if (eventGridEvent.Subject.Equals("JoinedGuild") && eventGridEvent.EventType.Equals("DNetBot.Guild.Joined"))
             {
-                log.LogInformation(EventIdentifiers.DiscordGuildJoined, "Analytics Guild Create Service triggered from Guild Joined Event On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
+                log.LogInformation(new EventId(1, "GuildJoin"), "Analytics Guild Create Service triggered from Guild Joined Event On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
                 var guild = JsonConvert.DeserializeObject<DiscordGuild>(eventGridEvent.Data.ToString());
+                
                 var storeGuild = new GuildTableEntity(guild.Id.ToString(), "Guild.Info", guild);
-
-                _dataStore.InsertOrMergeObject("Analytics_Guilds", storeGuild);
+                _dataStore.InsertOrMergeObject("AnalyticsGuilds", storeGuild);
 
                 foreach (var channel in guild.ChannelIds)
                 {
                     var storeChannel = new ChannelTableEntity(guild.Id.ToString(), channel.ToString(), guild.Id, channel);
-                    _dataStore.InsertOrMergeObject("Analytics_Channels", storeChannel);
+                    _dataStore.InsertOrMergeObject("AnalyticsChannels", storeChannel);
                 }
             }
             else

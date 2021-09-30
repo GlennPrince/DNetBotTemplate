@@ -1,8 +1,5 @@
 ﻿using DNetUtils.Entities;
 using Microsoft.Azure.Cosmos.Table;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DNetBotFunctions.Analytics.Data
 {

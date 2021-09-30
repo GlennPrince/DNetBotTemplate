@@ -2,7 +2,6 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
 namespace DNetUtils.Entities
