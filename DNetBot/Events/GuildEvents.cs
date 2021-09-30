@@ -16,6 +16,13 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Joined Guild: " + guild.Id);
             var serializedGuild = new DiscordGuild(guild).ToString();
             cachedData.StringSet("guild:" + guild.Id.ToString(), serializedGuild);
+
+            foreach(var channel in guild.Channels)
+            {
+                var serializedChannel = new DiscordChannel(channel).ToString();
+                cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
+            }
+
             return SendEvent("guild", "JoinedGuild", "DNetBot.Guild.Joined", "guild:" + guild.Id.ToString());
         }
 
@@ -35,6 +42,13 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "Guild Became Available: " + guild.Id);
             var serializedGuild = new DiscordGuild(guild).ToString();
             cachedData.StringSet("guild:" + guild.Id.ToString(), serializedGuild);
+
+            foreach (var channel in guild.Channels)
+            {
+                var serializedChannel = new DiscordChannel(channel).ToString();
+                cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
+            }
+
             return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", "guild:" + guild.Id.ToString());
         }
 

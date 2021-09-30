@@ -49,7 +49,6 @@ namespace DNetUtils.Entities
         /// The number of Members in the Guild 
         /// </summary>
         public int MemberCount { get; set; }
-
         /// <summary> 
         /// The amount of time (in seconds) a user must be inactive in a voice channel before they are automatically moved to the AFK voice channel. 
         /// </summary>

@@ -142,6 +142,7 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
             
+
             # Logout of Azure CLI
           - name: Logout of Azure
             run: az logout

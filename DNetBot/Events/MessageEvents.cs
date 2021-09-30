@@ -15,7 +15,7 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "New Message From : " + message.Source.ToString() + " | Message Content: " + message.Content);
             var serializedMessage = new DiscordMessage(message).ToString();
-            cachedData.StringSet("message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString(), serializedMessage);
+            cachedData.StringSet("message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString(), serializedMessage, TimeSpan.FromMinutes(10));
             return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", "message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString());
         }
 

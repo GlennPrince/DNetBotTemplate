@@ -1,4 +1,5 @@
 ﻿using DNetBotFunctions.Clients;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,10 @@ namespace DNetBotFunctions
         {
             var configuration = builder.GetContext().Configuration;
             string cacheConnection = configuration.GetValue<string>("RedisServer");
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(configuration.GetValue<string>("AzureWebJobsStorage"));
+
             builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(cacheConnection));
+            builder.Services.AddSingleton(storageAccount.CreateCloudTableClient(new TableClientConfiguration()));
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

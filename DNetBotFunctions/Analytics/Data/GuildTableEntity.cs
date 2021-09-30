@@ -1,43 +1,13 @@
 ﻿using DNetUtils.Entities;
 using Microsoft.Azure.Cosmos.Table;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace DNetBotFunctions.Clients.TableEntities
+namespace DNetBotFunctions.Analytics.Data
 {
-    public class GuildEntity : TableEntity
+    public class GuildTableEntity : TableEntity
     {
-        public GuildEntity(DiscordGuild guild)
-        {
-            PartitionKey = guild.Id.ToString();
-            RowKey = "Guild.Info";
-
-            Id = guild.Id.ToString();
-            Name = guild.Name;
-            IconId = guild.IconId;
-            IconURL = guild.IconURL;
-            SplashId = guild.SplashId;
-            SplashURL = guild.SplashURL;
-            MemberCount = guild.MemberCount;
-
-            AFKTimeout = guild.AFKTimeout;
-            IsEmbeddable = guild.IsEmbeddable;
-            DefaultMessageNotifications = guild.DefaultMessageNotifications;
-            ExplicitContentFilter = guild.ExplicitContentFilter;
-            MfaLevel = guild.MfaLevel;
-            VerificationLevel = guild.VerificationLevel;
-
-            if (guild.ApplicationId.HasValue)
-                ApplicationId = guild.ApplicationId.ToString();
-            OwnerId = guild.OwnerId.ToString();
-            DefaultChannelId = guild.DefaultChannelId.ToString();
-            EmbedChannelId = guild.EmbedChannelId.ToString();
-            EveryoneId = guild.EveryoneId.ToString();
-            SystemChannelId = guild.SystemChannelId.ToString();
-
-            CreatedAt = guild.CreatedAt.UtcDateTime;
-            VoiceRegionId = guild.VoiceRegionId;
-        }
-
         /// <summary> 
         /// The Id / Snowflake of this guild. 
         /// </summary>
@@ -74,7 +44,6 @@ namespace DNetBotFunctions.Clients.TableEntities
         /// The number of Members in the Guild 
         /// </summary>
         public int MemberCount { get; set; }
-
         /// <summary> 
         /// The amount of time (in seconds) a user must be inactive in a voice channel before they are automatically moved to the AFK voice channel. 
         /// </summary>
@@ -99,7 +68,6 @@ namespace DNetBotFunctions.Clients.TableEntities
         /// Verification Requirements for the Guild (0 = None, 1 = Email, 2 = Email + 5 Min Wait, 3 = Email + 10 min wait, 4 = Phone) 
         /// </summary>
         public int VerificationLevel { get; set; }
-
         /// <summary> 
         /// Application Id of the guild creator if it is bot-created. 
         /// </summary>
@@ -124,15 +92,10 @@ namespace DNetBotFunctions.Clients.TableEntities
         /// Id for the SocketTextChannel that receives randomized welcome messages 
         /// </summary>
         public string SystemChannelId { get; set; }
-
         /// <summary> 
         /// Date the Guild was Created 
         /// </summary>
         public DateTime CreatedAt { get; set; }
-        /// <summary> 
-        /// Voice Region for the Server 
-        /// </summary>
-        public string VoiceRegionId { get; set; }
         /// <summary> 
         /// Premium Tier for the Guild (0 = None, 1 = Tier 1 Boosts, 2 = Tier 2 Boosts, 3 = Tier 3 Boosts) 
         /// </summary>
@@ -145,13 +108,39 @@ namespace DNetBotFunctions.Clients.TableEntities
         /// This is the number of users who have boosted this guild. 
         /// </summary>
         public int PremiumSubscriptionCount { get; set; }
-        /// <summary> 
-        /// The preferred locale of this guild in IETF BCP 47 language tag format. 
-        /// </summary>
-        public string PreferredLocale { get; set; }
-        /// <summary> 
-        /// The preferred culture of this guild. 
-        /// </summary>
-        public string PreferredCulture { get; set; }
+
+        public GuildTableEntity() { }
+
+        public GuildTableEntity(string _partitionKey, string _rowKey, DiscordGuild guild)
+        {
+            PartitionKey = _partitionKey;
+            RowKey = _rowKey;
+
+            Id = guild.Id.ToString();
+            Name = guild.Name;
+            IconId = guild.IconId;
+            IconURL = guild.IconURL;
+            SplashId = guild.SplashId;
+            SplashURL = guild.SplashURL;
+            BannerId = guild.BannerId;
+            BannerURL = guild.BannerURL;
+            MemberCount = guild.MemberCount;
+            AFKTimeout = guild.AFKTimeout;
+            IsEmbeddable = guild.IsEmbeddable;
+            DefaultMessageNotifications = guild.DefaultMessageNotifications;
+            ExplicitContentFilter = guild.ExplicitContentFilter;
+            MfaLevel = guild.MfaLevel;
+            VerificationLevel = guild.VerificationLevel;
+            ApplicationId = guild.ApplicationId.ToString();
+            OwnerId = guild.OwnerId.ToString();
+            DefaultChannelId = guild.DefaultChannelId.ToString();
+            EmbedChannelId = guild.EmbedChannelId.ToString();
+            EveryoneId = guild.EveryoneId.ToString();
+            SystemChannelId = guild.SystemChannelId.ToString();
+            CreatedAt = guild.CreatedAt.UtcDateTime;
+            PremiumTier = guild.PremiumTier;
+            VanityURLCode = guild.VanityURLCode;
+            PremiumSubscriptionCount = guild.PremiumSubscriptionCount;
+        }
     }
 }
