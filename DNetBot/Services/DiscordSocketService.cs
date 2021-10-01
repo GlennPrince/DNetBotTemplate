@@ -130,7 +130,7 @@ namespace DNetBot.Services
 
             // Events that occur when a bot is added or removed from a server
             discordClient.JoinedGuild += async g => await GuildJoin(g);
-            discordClient.LeftGuild += async g => await GuildJoin(g);
+            discordClient.LeftGuild += async g => await GuildLeave(g);
 
             // Events that occur when a server information changes
             discordClient.GuildAvailable += async g => await GuildAvailable(g);

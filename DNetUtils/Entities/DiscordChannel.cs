@@ -30,8 +30,11 @@ namespace DNetUtils.Entities
         public DiscordChannel(SocketChannel channel)
         {
             ID = channel.Id;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if(channel.Users != null)
+            { 
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestChannel channel)
@@ -46,8 +49,11 @@ namespace DNetUtils.Entities
             GuildID = channel.Guild.Id;
             Name = channel.Name;
             Position = channel.Position;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestGuildChannel channel)
@@ -71,8 +77,11 @@ namespace DNetUtils.Entities
             NSFW = channel.IsNsfw;
             Mention = channel.Mention;
             ChannelType = ChannelType.Text;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestTextChannel channel)
@@ -100,8 +109,11 @@ namespace DNetUtils.Entities
             UserLimit = channel.UserLimit;
             CategoryID = channel.CategoryId;
             ChannelType = ChannelType.Voice;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestVoiceChannel channel)
@@ -122,8 +134,11 @@ namespace DNetUtils.Entities
             ID = channel.Id;
             Recipients.Add(channel.Recipient.Id);
             ChannelType = ChannelType.DM;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestDMChannel channel)
@@ -137,19 +152,28 @@ namespace DNetUtils.Entities
         {
             ID = channel.Id;
             Name = channel.Name;
-            foreach(var recipient in channel.Recipients)
-                Recipients.Add(recipient.Id);
+            if (channel.Recipients != null)
+            {
+                foreach (var recipient in channel.Recipients)
+                    Recipients.Add(recipient.Id);
+            }
             ChannelType = ChannelType.Group;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestGroupChannel channel)
         {
             ID = channel.Id;
             Name = channel.Name;
-            foreach (var recipient in channel.Recipients)
-                Recipients.Add(recipient.Id);
+            if (channel.Recipients != null)
+            {
+                foreach (var recipient in channel.Recipients)
+                    Recipients.Add(recipient.Id);
+            }
             ChannelType = ChannelType.Group;
         }
 
@@ -157,13 +181,19 @@ namespace DNetUtils.Entities
         {
             ID = channel.Id;
             Name = channel.Name;
-            foreach (var childChannel in channel.Channels)
-                CategorizedChannels.Add(childChannel.Id);
             Position = channel.Position;
             GuildID = channel.Guild.Id;
             ChannelType = ChannelType.Category;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Channels != null)
+            {
+                foreach (var childChannel in channel.Channels)
+                    CategorizedChannels.Add(childChannel.Id);
+            }
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestCategoryChannel channel)
@@ -187,8 +217,11 @@ namespace DNetUtils.Entities
             NSFW = channel.IsNsfw;
             Mention = channel.Mention;
             ChannelType = ChannelType.News;
-            foreach (var user in channel.Users)
-                Users.Add(user.Id);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
         }
 
         public DiscordChannel(RestNewsChannel channel)
@@ -224,14 +257,22 @@ namespace DNetUtils.Entities
             BitRate = channel.BitRate;
             UserLimit = channel.UserLimit;
 
-            foreach (var childChannel in channel.CategorizedChannels)
-                CategorizedChannels.Add(childChannel);
+            if (channel.CategorizedChannels != null)
+            {
+                foreach (var childChannel in channel.CategorizedChannels)
+                    CategorizedChannels.Add(childChannel);
+            }
+            if (channel.Recipients != null)
+            {
+                foreach (var recipient in channel.Recipients)
+                    Recipients.Add(recipient);
+            }
 
-            foreach (var recipient in channel.Recipients)
-                Recipients.Add(recipient);
-
-            foreach (var user in channel.Users)
-                Users.Add(user);
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user);
+            }
 
             ChannelType = channel.ChannelType;
         }
