@@ -23,7 +23,9 @@ namespace DNetBot
         {
             services.AddControllers();
             services.AddApplicationInsightsTelemetryWorkerService(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration["RedisServer"]));
+            var redisConfig = ConfigurationOptions.Parse(Configuration["RedisServer"]);
+            redisConfig.AllowAdmin = true;
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConfig));
             services.AddSingleton<DiscordSocketService>();
         }
 
