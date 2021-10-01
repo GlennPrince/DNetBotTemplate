@@ -76,6 +76,7 @@ namespace DNetBot.Services
             foreach (var channel in guild.Channels)
             {
                 var fullChannel = discordClient.GetChannel(channel.Id);
+                Formatter.GenerateLog(_logger, LogSeverity.Info, "Redis", "Creating Channel of Type: " + fullChannel.GetType().FullName);
                 var serializedChannel = new DiscordChannel(fullChannel).ToString();
                 cachedData.StringSet("channel:" + channel.Id.ToString(), serializedChannel);
             }
