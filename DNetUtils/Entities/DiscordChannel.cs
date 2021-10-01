@@ -30,7 +30,7 @@ namespace DNetUtils.Entities
         public DiscordChannel(SocketChannel channel)
         {
             ID = channel.Id;
-            if(channel.Users != null)
+            if (channel.Users.Count > 0)
             { 
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -49,7 +49,7 @@ namespace DNetUtils.Entities
             GuildID = channel.Guild.Id;
             Name = channel.Name;
             Position = channel.Position;
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -77,7 +77,7 @@ namespace DNetUtils.Entities
             NSFW = channel.IsNsfw;
             Mention = channel.Mention;
             ChannelType = ChannelType.Text;
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -109,7 +109,7 @@ namespace DNetUtils.Entities
             UserLimit = channel.UserLimit;
             CategoryID = channel.CategoryId;
             ChannelType = ChannelType.Voice;
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -134,7 +134,7 @@ namespace DNetUtils.Entities
             ID = channel.Id;
             Recipients.Add(channel.Recipient.Id);
             ChannelType = ChannelType.DM;
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -152,13 +152,13 @@ namespace DNetUtils.Entities
         {
             ID = channel.Id;
             Name = channel.Name;
-            if (channel.Recipients != null)
+            if (channel.Recipients.Count > 0)
             {
                 foreach (var recipient in channel.Recipients)
                     Recipients.Add(recipient.Id);
             }
             ChannelType = ChannelType.Group;
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -169,7 +169,7 @@ namespace DNetUtils.Entities
         {
             ID = channel.Id;
             Name = channel.Name;
-            if (channel.Recipients != null)
+            if (channel.Recipients.Count > 0)
             {
                 foreach (var recipient in channel.Recipients)
                     Recipients.Add(recipient.Id);
@@ -184,12 +184,12 @@ namespace DNetUtils.Entities
             Position = channel.Position;
             GuildID = channel.Guild.Id;
             ChannelType = ChannelType.Category;
-            if (channel.Channels != null)
+            if (channel.Channels.Count > 0)
             {
                 foreach (var childChannel in channel.Channels)
                     CategorizedChannels.Add(childChannel.Id);
             }
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -217,7 +217,7 @@ namespace DNetUtils.Entities
             NSFW = channel.IsNsfw;
             Mention = channel.Mention;
             ChannelType = ChannelType.News;
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
@@ -257,18 +257,18 @@ namespace DNetUtils.Entities
             BitRate = channel.BitRate;
             UserLimit = channel.UserLimit;
 
-            if (channel.CategorizedChannels != null)
+            if (channel.CategorizedChannels.Count > 0)
             {
                 foreach (var childChannel in channel.CategorizedChannels)
                     CategorizedChannels.Add(childChannel);
             }
-            if (channel.Recipients != null)
+            if (channel.Recipients.Count > 0)
             {
                 foreach (var recipient in channel.Recipients)
                     Recipients.Add(recipient);
             }
 
-            if (channel.Users != null)
+            if (channel.Users.Count > 0)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user);
