@@ -83,6 +83,11 @@ namespace DNetBot.Services
 
             ConfigureEventHandlers();
 
+            // Flush the Redis server on start
+            var endpoints = _connectionMultiplexer.GetEndPoints();
+            foreach (var endpoint in endpoints)
+                _connectionMultiplexer.GetServer(endpoint).FlushDatabase();
+
             cachedData = _connectionMultiplexer.GetDatabase();
 
             discordClient.LoginAsync(Discord.TokenType.Bot, botToken).Wait();

@@ -35,7 +35,7 @@ namespace DNetBotFunctions.Analytics.Guild
             log.LogInformation(new EventId(1, "GuildJoin"), "Analytics Guild Create Service triggered from Guild Joined Event On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
 
             IDatabase cache = _redis.GetDatabase();
-            var cachedGuild = cache.StringGet("guild:" + eventGridEvent.Data.ToString());
+            var cachedGuild = cache.StringGet(eventGridEvent.Data.ToString());
 
             var guild = JsonConvert.DeserializeObject<DiscordGuild>(cachedGuild);
                 
