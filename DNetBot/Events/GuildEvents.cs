@@ -124,7 +124,6 @@ namespace DNetBot.Services
             foreach (var channel in newGuild.Channels)
             {
                 var fullChannel = discordClient.GetChannel(channel.Id);
-                var fullChannel = discordClient.GetChannel(channel.Id);
                 if (fullChannel.GetType() == typeof(SocketCategoryChannel))
                     cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
                 else if (fullChannel.GetType() == typeof(SocketDMChannel))
@@ -201,23 +200,23 @@ namespace DNetBot.Services
         private Task ChannelUpdated(SocketChannel oldChannel, SocketChannel newChannel)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "Channel Updated: " + newChannel.Id);
-            var fullChannel = discordClient.GetChannel(channel.Id);
+            var fullChannel = discordClient.GetChannel(newChannel.Id);
             if (fullChannel.GetType() == typeof(SocketCategoryChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketDMChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketDMChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketDMChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketGroupChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketGroupChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketGroupChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketGuildChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketGuildChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketGuildChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketNewsChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketNewsChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketNewsChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketTextChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketTextChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketTextChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketVoiceChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
             else
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+                cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
             return SendEvent("channel", "ChannelUpdated", "DNetBot.Channel.Updated", "channel:" + newChannel.Id.ToString());
         }
 
@@ -233,23 +232,23 @@ namespace DNetBot.Services
         private Task ChannelJoined(SocketGroupUser user)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "User: " + user.Id + " Joined Channel: " + user.Channel.Id);
-            var fullChannel = discordClient.GetChannel(channel.Id);
+            var fullChannel = discordClient.GetChannel(user.Channel.Id);
             if (fullChannel.GetType() == typeof(SocketCategoryChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketDMChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketDMChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketDMChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketGroupChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketGroupChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketGroupChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketGuildChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketGuildChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketGuildChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketNewsChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketNewsChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketNewsChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketTextChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketTextChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketTextChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketVoiceChannel))
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
             else
-                cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
             return SendEvent("channel", "ChannelJoined", "DNetBot.Channel.Joined", "channel_users:" + user.Id.ToString() + ":" + user.Channel.Id.ToString());
         }
 
