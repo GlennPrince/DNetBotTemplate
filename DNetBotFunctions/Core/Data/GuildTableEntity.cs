@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DNetBotFunctions.Analytics.Data
+namespace DNetBotFunctions.Core.Data
 {
     public class GuildTableEntity : TableEntity
     {

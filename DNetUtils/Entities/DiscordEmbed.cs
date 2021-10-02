@@ -44,6 +44,7 @@ namespace DNetUtils.Entities
         public int? ThumbnailWidth { get; }
 
         public DiscordEmbed() { }
+
         public DiscordEmbed(Embed embed)
         {
             Type = embed.Type;

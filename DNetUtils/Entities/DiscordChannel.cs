@@ -26,6 +26,8 @@ namespace DNetUtils.Entities
         public string Mention { get; set; }
         public ChannelType ChannelType { get; set; }
 
+        public DiscordChannel() { }
+
         // Basic Channel Types
         public DiscordChannel(SocketChannel channel)
         {

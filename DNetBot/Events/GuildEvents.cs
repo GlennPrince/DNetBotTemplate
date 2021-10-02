@@ -29,6 +29,12 @@ namespace DNetBot.Services
                 features += feature + ";";
             cachedData.StringSet("feature:" + guild.Id.ToString(), features);
 
+            foreach (var user in guild.Users)
+            {
+                var serializedUser = new DiscordUser(user).ToString();
+                cachedData.StringSet("user:" + guild.Id.ToString() + ":" + user.Id.ToString(), serializedUser);
+            }
+
             foreach (var role in guild.Roles)
             {
                 var serializedRole = new DiscordRole(role).ToString();
@@ -52,6 +58,12 @@ namespace DNetBot.Services
 
             foreach (var channel in guild.Channels)
                 cachedData.KeyDelete("channel:" + channel.Id.ToString());
+
+            foreach (var user in guild.Users)
+                cachedData.KeyDelete("user:" + guild.Id.ToString() + ":" + user.Id.ToString());
+
+            foreach (var role in guild.Roles)
+                cachedData.KeyDelete("role:" + guild.Id.ToString() + ":" + role.Id.ToString());
 
             cachedData.KeyDelete("feature:" + guild.Id.ToString());
 
@@ -92,6 +104,12 @@ namespace DNetBot.Services
                     cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
                 else
                     cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+            }
+
+            foreach (var user in guild.Users)
+            {
+                var serializedUser = new DiscordUser(user).ToString();
+                cachedData.StringSet("user:" + guild.Id.ToString() + ":" + user.Id.ToString(), serializedUser);
             }
 
             string features = "";
@@ -140,6 +158,12 @@ namespace DNetBot.Services
                     cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
                 else
                     cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+            }
+
+            foreach (var user in newGuild.Users)
+            {
+                var serializedUser = new DiscordUser(user).ToString();
+                cachedData.StringSet("user:" + newGuild.Id.ToString() + ":" + user.Id.ToString(), serializedUser);
             }
 
             string features = "";
@@ -193,6 +217,10 @@ namespace DNetBot.Services
                 cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
             else
                 cachedData.StringSet("channel:" + channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+
+            foreach(var user in channel.Users)
+                cachedData.StringSet("channel_users:" + channel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+
             return SendEvent("channel", "ChannelCreated", "DNetBot.Channel.Created", "channel:" + channel.Id.ToString());
         }
 
@@ -217,6 +245,10 @@ namespace DNetBot.Services
                 cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
             else
                 cachedData.StringSet("channel:" + newChannel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+
+            foreach (var user in newChannel.Users)
+                cachedData.StringSet("channel_users:" + newChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+
             return SendEvent("channel", "ChannelUpdated", "DNetBot.Channel.Updated", "channel:" + newChannel.Id.ToString());
         }
 
@@ -225,6 +257,10 @@ namespace DNetBot.Services
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "Channel Deleted: " + channel.Id);
             cachedData.KeyDelete("channel:" + channel.Id.ToString());
+
+            foreach (var user in channel.Users)
+                cachedData.KeyDelete("channel_users:" + channel.Id.ToString() + ":" + user.Id.ToString());
+
             return SendEvent("channel", "ChannelDeleted", "DNetBot.Channel.Deleted", "channel:" + channel.Id.ToString());
         }
 
@@ -234,21 +270,22 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Channel", "User: " + user.Id + " Joined Channel: " + user.Channel.Id);
             var fullChannel = discordClient.GetChannel(user.Channel.Id);
             if (fullChannel.GetType() == typeof(SocketCategoryChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketCategoryChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketDMChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketDMChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketDMChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketGroupChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketGroupChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketGroupChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketGuildChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketGuildChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketGuildChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketNewsChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketNewsChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketNewsChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketTextChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketTextChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketTextChannel)fullChannel).ToString());
             else if (fullChannel.GetType() == typeof(SocketVoiceChannel))
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel((SocketVoiceChannel)fullChannel).ToString());
             else
-                cachedData.StringSet("channel:" + user.Channel.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+                cachedData.StringSet("channel_users:" + fullChannel.Id.ToString() + ":" + user.Id.ToString(), new DiscordChannel(fullChannel).ToString());
+
             return SendEvent("channel", "ChannelJoined", "DNetBot.Channel.Joined", "channel_users:" + user.Id.ToString() + ":" + user.Channel.Id.ToString());
         }
 

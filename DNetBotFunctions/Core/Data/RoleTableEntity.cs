@@ -1,7 +1,7 @@
 ﻿using DNetUtils.Entities;
 using Microsoft.Azure.Cosmos.Table;
 
-namespace DNetBotFunctions.Analytics.Data
+namespace DNetBotFunctions.Core.Data
 {
     public class RoleTableEntity : TableEntity
     {

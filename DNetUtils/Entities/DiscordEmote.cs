@@ -16,6 +16,8 @@ namespace DNetUtils.Entities
         public bool IsManaged { get; set; }
         public bool RequireColons { get; set; }
 
+        DiscordEmote() { }
+
         public DiscordEmote(Emote emote)
         {
             ID = emote.Id;

@@ -2,7 +2,7 @@
 using Microsoft.Azure.Cosmos.Table;
 using System;
 
-namespace DNetBotFunctions.Analytics.Data
+namespace DNetBotFunctions.Core.Data
 {
     public class MessageTableEntity : TableEntity
     {

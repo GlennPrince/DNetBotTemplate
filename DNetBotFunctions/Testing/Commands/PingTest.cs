@@ -9,12 +9,10 @@ using Microsoft.Extensions.Logging;
 using DNetUtils.Entities;
 using Microsoft.Azure.EventGrid;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using DNetBotFunctions.Clients;
 using StackExchange.Redis;
-using DNetBotFunctions.Analytics.Data;
 
-namespace DNetBotFunctions.Events.Messaging
+namespace DNetBotFunctions.Testing.Commands
 {
     public class Testing_PingTest
     {
@@ -44,9 +42,6 @@ namespace DNetBotFunctions.Events.Messaging
             }
 
             var message = new DiscordMessage(cachedMessage);
-
-            var storeMessage = new MessageTableEntity(message.ChannelId.ToString(), message.MessageId.ToString(), message);
-            _dataStore.InsertOrMergeObject("AnalyticsMessage", storeMessage);
 
             if (message.Content.StartsWith("!ping"))
             {

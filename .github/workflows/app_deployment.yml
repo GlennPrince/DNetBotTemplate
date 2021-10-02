@@ -132,9 +132,78 @@ jobs:
           - name: Logout of Azure
             run: az logout
 
+    function-core-topic-subscriptions:
+        name: 'Create Core Function Topic Subscriptions'
+        runs-on: ubuntu-latest
+        needs: [build-and-deploy]
+        steps:
 
-    function-topic-subscriptions:
-        name: 'Create Function Topic Subscriptions'
+          - name: Login via Azure Module                                              # Login via the Azure Module
+            uses: azure/login@v1
+            with:
+                creds: ${{secrets.AZURE_CREDENTIALS}}
+                enable-AzPSSession: true
+
+            # Check out the source code from the main branch
+          - name: 'Check Out Main'
+            uses: actions/checkout@main
+            with:
+                ref: development
+
+            # Function Subscribe to the Guild Topic for Core Guild Create
+          - name: Subscribe Core Guild Create Function to Topic
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-guild-create
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Guild_Create
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/guild
+
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
+            
+            # Function Subscribe to the Channel Topic for Core Channel Create
+          - name: Subscribe Core Channel Create Function to Topic
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-channel-create
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Channel_Create
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/channel
+
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
+
+            # Function Subscribe to the Channel Topic for Core Message Create
+          - name: Subscribe Core Message Create Function to Topic
+            uses: azure/CLI@v1
+            env:
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-channel-create
+                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Message_Create
+                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/message
+
+            with:
+                azcliversion: 2.14.2
+                inlineScript: |
+                  echo ::add-mask::$SUBSCRIPTION_NAME
+                  echo ::add-mask::$ENDPOINT_ADDRESS
+                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
+
+            # Logout of Azure CLI
+          - name: Logout of Azure
+            run: az logout
+
+    function-example-topic-subscriptions:
+        name: 'Create Example Function Topic Subscriptions'
         runs-on: ubuntu-latest
         needs: [build-and-deploy]
         steps:
@@ -152,7 +221,7 @@ jobs:
                 ref: development
 
             # Function Subscribe to the New Message Topic for Ping Test
-          - name: Subscribe New Message Function to Topic
+          - name: Subscribe Ping Test Message Function to Topic
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
@@ -167,23 +236,6 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
             
-            # Function Subscribe to the Guild Join Topic for Analytics Guild Create
-          - name: Subscribe New Message Function to Topic
-            uses: azure/CLI@v1
-            env:
-                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-messages-new
-                EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
-                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Analytics_GuildCreate
-                TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/guild
-
-            with:
-                azcliversion: 2.14.2
-                inlineScript: |
-                  echo ::add-mask::$SUBSCRIPTION_NAME
-                  echo ::add-mask::$ENDPOINT_ADDRESS
-                  az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
-
             # Logout of Azure CLI
           - name: Logout of Azure
             run: az logout
-

@@ -13,6 +13,8 @@ namespace DNetUtils.Entities
         public int Height { get; set; }
         public int Width { get; set; }
 
+        public DiscordAttachment() { }
+
         public DiscordAttachment(Attachment attachment)
         {
             ID = attachment.Id;

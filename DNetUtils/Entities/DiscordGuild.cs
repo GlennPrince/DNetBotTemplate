@@ -112,6 +112,10 @@ namespace DNetUtils.Entities
         /// </summary>
         public ICollection<ulong> CategoryIds { get; set; }
         /// <summary> 
+        /// List of the Guilds Emote Id's 
+        /// </summary>
+        public ICollection<ulong> UserIds { get; set; }
+        /// <summary> 
         /// List of the Guilds Role Id's 
         /// </summary>
         public ICollection<ulong> RoleIds { get; set; }
@@ -187,6 +191,10 @@ namespace DNetUtils.Entities
             CategoryIds = new List<ulong>();
             foreach (var category in guild.CategoryChannels)
                 CategoryIds.Add(category.Id);
+
+            UserIds = new List<ulong>();
+            foreach (var users in guild.Users)
+                UserIds.Add(users.Id);
 
             RoleIds = new List<ulong>();
             foreach (var role in guild.Roles)
@@ -268,6 +276,10 @@ namespace DNetUtils.Entities
             CategoryIds = new List<ulong>();
             foreach (var category in guild.CategoryIds)
                 CategoryIds.Add(category);
+
+            UserIds = new List<ulong>();
+            foreach (var users in guild.UserIds)
+                UserIds.Add(users);
 
             RoleIds = new List<ulong>();
             foreach (var role in guild.RoleIds)

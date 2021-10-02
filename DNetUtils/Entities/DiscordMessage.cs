@@ -56,6 +56,11 @@ namespace DNetUtils.Entities
         /// </summary>
         public ICollection<ulong> AttachmentIDs { get; set; }
 
+        /// <summary> 
+        /// A collection of Ids / Snowflakes of embeds associated within the message
+        /// </summary>
+        public ICollection<string> EmbedTitles { get; set; }
+
         public DiscordMessage() { }
 
         public DiscordMessage(SocketMessage message)
@@ -83,6 +88,10 @@ namespace DNetUtils.Entities
             AttachmentIDs = new List<ulong>();
             foreach (var attachment in message.Attachments)
                 AttachmentIDs.Add(attachment.Id);
+
+            EmbedTitles = new List<string>();
+            foreach (var embed in message.Embeds)
+                EmbedTitles.Add(embed.Title);
         }
 
         public DiscordMessage(RestMessage message)
@@ -110,6 +119,10 @@ namespace DNetUtils.Entities
             AttachmentIDs = new List<ulong>();
             foreach (var attachment in message.Attachments)
                 AttachmentIDs.Add(attachment.Id);
+
+            EmbedTitles = new List<string>();
+            foreach (var embed in message.Embeds)
+                EmbedTitles.Add(embed.Title);
         }
 
         public DiscordMessage(string json)
@@ -139,6 +152,10 @@ namespace DNetUtils.Entities
             AttachmentIDs = new List<ulong>();
             foreach (var attachment in message.AttachmentIDs)
                 AttachmentIDs.Add(attachment);
+
+            EmbedTitles = new List<string>();
+            foreach (var embed in message.EmbedTitles)
+                EmbedTitles.Add(embed);
         }
 
         /// <summary> 

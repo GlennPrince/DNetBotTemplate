@@ -23,6 +23,8 @@ namespace DNetUtils.Entities
 
         public ICollection<ulong> MemberIDs { get; set; }
 
+        public DiscordRole() { }
+
         public DiscordRole(SocketRole role)
         {
             ID = role.Id;
