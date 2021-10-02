@@ -255,8 +255,8 @@ jobs:
             with:
                 ref: development
 
-            # Function Subscribe to the Guild Topic for Core Guild Create
-          - name: Subscribe Core Guild Create Function to Topic
+            # Function Subscribe to the Guild Topic for Core Guild Save
+          - name: Subscribe Core Guild Save Function to Topic
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-guild-create
@@ -271,13 +271,13 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
             
-            # Function Subscribe to the Channel Topic for Core Channel Create
-          - name: Subscribe Core Channel Create Function to Topic
+            # Function Subscribe to the Channel Topic for Core Channel Save
+          - name: Subscribe Core Channel Save Function to Topic
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-channel-create
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
-                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Channel_Create
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Channel_Save
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/channel
 
             with:
@@ -287,13 +287,13 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
 
-            # Function Subscribe to the Channel Topic for Core Message Create
-          - name: Subscribe Core Message Create Function to Topic
+            # Function Subscribe to the Channel Topic for Core Message Save
+          - name: Subscribe Core Message Save Function to Topic
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-channel-create
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
-                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Message_Create
+                ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Message_Save
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/message
 
             with:
