@@ -80,7 +80,7 @@ namespace DNetUtils.Entities
             Mention = channel.Mention;
             ChannelType = ChannelType.Text;
             Users = new List<ulong>();
-            if (channel.Users.Count != null)
+            if (channel.Users != null)
             {
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
