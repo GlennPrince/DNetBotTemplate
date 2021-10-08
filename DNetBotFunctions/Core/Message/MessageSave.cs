@@ -14,8 +14,6 @@ namespace DNetBotFunctions.Core.Guild
 {
     public class Core_Message_Save
     {
-        private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
-
         private IConnectionMultiplexer _redis;
         private DataStoreClient _dataStore;
         public Core_Message_Save(IConnectionMultiplexer redis)

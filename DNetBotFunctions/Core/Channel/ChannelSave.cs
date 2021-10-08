@@ -10,12 +10,10 @@ using DNetUtils.Entities;
 using DNetBotFunctions.Clients;
 using DNetBotFunctions.Core.Data;
 
-namespace DNetBotFunctions.Core.Guild
+namespace DNetBotFunctions.Core.Channel
 {
     public class Core_Channel_Save
     {
-        private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
-
         private IConnectionMultiplexer _redis;
         private DataStoreClient _dataStore;
         public Core_Channel_Save(IConnectionMultiplexer redis)
