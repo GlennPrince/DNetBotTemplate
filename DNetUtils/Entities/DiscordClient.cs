@@ -13,6 +13,8 @@ namespace DNetUtils.Entities
         public ICollection<ulong> dmChannels;
         public ICollection<ulong> guildChannels;
 
+        public DiscordClient() { }
+
         public DiscordClient(DiscordSocketClient client)
         {
             connectionState = client.ConnectionState;

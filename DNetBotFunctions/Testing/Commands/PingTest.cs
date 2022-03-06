@@ -9,19 +9,39 @@ using Microsoft.Extensions.Logging;
 using DNetUtils.Entities;
 using Microsoft.Azure.EventGrid;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using DNetBotFunctions.Clients;
+using StackExchange.Redis;
 
-namespace DNetBotFunctions.Events.Messaging
+namespace DNetBotFunctions.Testing.Commands
 {
-    public static class NewMessage
+    public class Testing_PingTest
     {
-        private static EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+        private IConnectionMultiplexer _redis;
+        private DataStoreClient _dataStore;
 
-        [FunctionName("NewMessage")]
-        public static void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
+        public Testing_PingTest(IConnectionMultiplexer redis)
+        {
+            _redis = redis;
+            _dataStore = new DataStoreClient();
+        }
+
+        private EventGridClient eventGridClient = new EventGridClient(new TopicCredentials(System.Environment.GetEnvironmentVariable("EventGridKey")));
+
+        [FunctionName("Testing_PingTest")]
+        public void Run([EventGridTrigger]EventGridEvent eventGridEvent, ILogger log)
         {
             log.LogInformation("New Message Event Triggered On: {Topic} with the Subject: {Subject}", eventGridEvent.Topic.ToString(), eventGridEvent.Subject.ToString());
-            var message = JsonConvert.DeserializeObject<DiscordMessage>(eventGridEvent.Data.ToString());
+
+            IDatabase cache = _redis.GetDatabase();
+            var cachedMessage = cache.StringGet(eventGridEvent.Data.ToString());
+
+            if (!cachedMessage.HasValue)
+            {
+                log.LogError("Could not retrieve cached value");
+                return;
+            }
+
+            var message = new DiscordMessage(cachedMessage);
 
             if (message.Content.StartsWith("!ping"))
             {

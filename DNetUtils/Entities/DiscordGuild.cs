@@ -49,7 +49,6 @@ namespace DNetUtils.Entities
         /// The number of Members in the Guild 
         /// </summary>
         public int MemberCount { get; set; }
-
         /// <summary> 
         /// The amount of time (in seconds) a user must be inactive in a voice channel before they are automatically moved to the AFK voice channel. 
         /// </summary>
@@ -112,6 +111,10 @@ namespace DNetUtils.Entities
         /// List of the Guilds Channel Category Id's 
         /// </summary>
         public ICollection<ulong> CategoryIds { get; set; }
+        /// <summary> 
+        /// List of the Guilds Emote Id's 
+        /// </summary>
+        public ICollection<ulong> UserIds { get; set; }
         /// <summary> 
         /// List of the Guilds Role Id's 
         /// </summary>
@@ -189,6 +192,10 @@ namespace DNetUtils.Entities
             foreach (var category in guild.CategoryChannels)
                 CategoryIds.Add(category.Id);
 
+            UserIds = new List<ulong>();
+            foreach (var users in guild.Users)
+                UserIds.Add(users.Id);
+
             RoleIds = new List<ulong>();
             foreach (var role in guild.Roles)
                 RoleIds.Add(role.Id);
@@ -234,7 +241,56 @@ namespace DNetUtils.Entities
 
         public DiscordGuild(string json)
         {
-            JsonConvert.DeserializeObject<DiscordGuild>(json);
+            var guild = JsonConvert.DeserializeObject<DiscordGuild>(json);
+
+            Id = guild.Id;
+            Name = guild.Name;
+            IconId = guild.IconId;
+            IconURL = guild.IconURL;
+            SplashId = guild.SplashId;
+            SplashURL = guild.SplashURL;
+            MemberCount = guild.MemberCount;
+
+            AFKTimeout = guild.AFKTimeout;
+            IsEmbeddable = guild.IsEmbeddable;
+            DefaultMessageNotifications = guild.DefaultMessageNotifications;
+            ExplicitContentFilter = guild.ExplicitContentFilter;
+            MfaLevel = guild.MfaLevel;
+            VerificationLevel = guild.VerificationLevel;
+
+            ApplicationId = guild.ApplicationId;
+            OwnerId = guild.OwnerId;
+            DefaultChannelId = guild.DefaultChannelId;
+            EmbedChannelId = guild.EmbedChannelId;
+            EveryoneId = guild.EveryoneId;
+            SystemChannelId = guild.SystemChannelId;
+
+            ChannelIds = new List<ulong>();
+            foreach (var channel in guild.ChannelIds)
+                ChannelIds.Add(channel);
+
+            VoiceIds = new List<ulong>();
+            foreach (var voice in guild.VoiceIds)
+                VoiceIds.Add(voice);
+
+            CategoryIds = new List<ulong>();
+            foreach (var category in guild.CategoryIds)
+                CategoryIds.Add(category);
+
+            UserIds = new List<ulong>();
+            foreach (var users in guild.UserIds)
+                UserIds.Add(users);
+
+            RoleIds = new List<ulong>();
+            foreach (var role in guild.RoleIds)
+                RoleIds.Add(role);
+
+            EmoteIds = new List<ulong>();
+            foreach (var emote in guild.EmoteIds)
+                EmoteIds.Add(emote);
+
+            CreatedAt = guild.CreatedAt;
+            VoiceRegionId = guild.VoiceRegionId;
         }
 
         /// <summary> 

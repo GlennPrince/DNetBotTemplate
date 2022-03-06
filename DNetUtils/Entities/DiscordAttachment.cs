@@ -13,6 +13,8 @@ namespace DNetUtils.Entities
         public int Height { get; set; }
         public int Width { get; set; }
 
+        public DiscordAttachment() { }
+
         public DiscordAttachment(Attachment attachment)
         {
             ID = attachment.Id;
@@ -30,6 +32,19 @@ namespace DNetUtils.Entities
                 Width = attachment.Width.Value;
             else
                 Width = 0;
+        }
+
+        public DiscordAttachment(string json)
+        {
+            var attachment = JsonConvert.DeserializeObject<DiscordAttachment>(json);
+
+            ID = attachment.ID;
+            FileName = attachment.FileName;
+            Url = attachment.Url;
+            ProxyUrl = attachment.ProxyUrl;
+            Size = attachment.Size;
+            Height = attachment.Height;
+            Width = attachment.Width;
         }
 
         /// <summary> 

@@ -10,12 +10,24 @@ namespace DNetUtils.Entities
         public ulong ChannelId { get; set; }
         public string EmoteName { get; set; }
 
+        public DiscordReaction() { }
+
         public DiscordReaction(SocketReaction reaction)
         {
             MessageID = reaction.MessageId;
             UserID = reaction.UserId;
             ChannelId = reaction.Channel.Id;
             EmoteName = reaction.Emote.Name;
+        }
+
+        public DiscordReaction(string json)
+        {
+            var reaction = JsonConvert.DeserializeObject<DiscordReaction>(json);
+
+            MessageID = reaction.MessageID;
+            UserID = reaction.UserID;
+            ChannelId = reaction.ChannelId;
+            EmoteName = reaction.EmoteName;
         }
 
         /// <summary> 

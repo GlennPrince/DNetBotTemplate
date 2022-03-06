@@ -137,6 +137,29 @@ namespace DNetUtils.Entities
             }
         }
 
+        public DiscordUser(string json)
+        {
+            var user = JsonConvert.DeserializeObject<DiscordUser>(json);
+
+            ID = user.ID;
+            Discriminator = user.Discriminator;
+            Username = user.Username;
+            Status = user.Status;
+            IsBot = user.IsBot;
+
+            ActivityType = user.ActivityType;
+            ActivityName = user.ActivityName;
+
+            AvatarId = user.AvatarId;
+            GuildId = user.GuildId;
+            Hierarchy = user.Hierarchy;
+            IsDeafened = user.IsDeafened;
+            IsMuted = user.IsMuted;
+            IsSelfDeafened = user.IsSelfDeafened;
+            JoinedAt = user.JoinedAt;
+            Permissions = user.Permissions;
+        }
+
         /// <summary> 
         /// Returns the User as a JSON formatted string
         /// </summary>

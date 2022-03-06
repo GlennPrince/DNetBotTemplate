@@ -77,6 +77,14 @@
     "use32BitWorkerProcess": {
       "type": "string",
       "defaultValue": "false"
+    },
+    "cacheName": {
+      "type": "string",
+      "defaultValue": "[concat(uniqueString(resourceGroup().id), '-cache')]",
+      "metadata": {
+        "description": "Redis Cache Name"
+      },
+      "minLength": 2
     }
   },
   "variables": {
@@ -114,6 +122,10 @@
             {
               "name": "AzureWebJobsStorage",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+            },
+            {
+              "name": "RedisServer",
+              "value": "[concat(parameters('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', parameters('cacheName')), '2015-08-01').primaryKey)]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
