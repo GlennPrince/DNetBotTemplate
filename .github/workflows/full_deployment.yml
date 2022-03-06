@@ -117,7 +117,7 @@ jobs:
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
                 WEBAPP_NAME: ${{ env.DNETBOT_NAME }}-proxy
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                     echo ::add-mask::$EVENTGRID_ENDPOINT
                     echo ::add-mask::$EVENTGRID_KEY
@@ -172,7 +172,7 @@ jobs:
             env:
                 FUNCTION_NAME: ${{ env.DNETBOT_NAME }}-function
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                     cd DNetBotFunctions-Release
                     zip -r ../dnet-func-release.zip *
@@ -207,7 +207,7 @@ jobs:
             env:
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name client  --output none
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name bot --output none
@@ -227,7 +227,7 @@ jobs:
                 ENDPOINT_ADDRESS: https://${{ env.DNETBOT_NAME }}-proxy.azurewebsites.net/api/EventGrid/ReturnMessage?token=${{ secrets.WEBHOOK_TOKEN }}
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/returnmessage
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
@@ -265,7 +265,7 @@ jobs:
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/guild
 
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
@@ -281,7 +281,7 @@ jobs:
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/channel
 
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
@@ -297,7 +297,7 @@ jobs:
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
 
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
@@ -335,7 +335,7 @@ jobs:
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
 
             with:
-                azcliversion: 2.14.2
+                azcliversion: 2.34.1
                 inlineScript: |
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
