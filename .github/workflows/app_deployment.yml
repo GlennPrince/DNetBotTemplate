@@ -93,8 +93,6 @@ jobs:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
-            with:
-                ref: development
 
             # Creates all the topics in the domain to support bot events
           - name: Create Event Grid Topics
@@ -113,8 +111,8 @@ jobs:
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user --output none
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage --output none
             
-            # Proxy Subscribe to the Return Topic
-          - name: Subscribe Proxy to Topics
+            # Proxy Subscribe to the Return Message Topic
+          - name: Subscribe Proxy to Return Message Topic
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-proxy-returnmessage
@@ -147,8 +145,6 @@ jobs:
             # Check out the source code from the main branch
           - name: 'Check Out Main'
             uses: actions/checkout@main
-            with:
-                ref: development
 
             # Function Subscribe to the Guild Topic for Core Guild Save
           - name: Subscribe Core Guild Save Function to Topic
@@ -182,11 +178,11 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
 
-            # Function Subscribe to the Channel Topic for Core Message Save
+            # Function Subscribe to the Message Topic for Core Message Save
           - name: Subscribe Core Message Save Function to Topic
             uses: azure/CLI@v1
             env:
-                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-channel-create
+                SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-function-core-message-create
                 EVENTGRID_DOMAIN: ${{ env.DNETBOT_NAME }}-eventgrid-domain
                 ENDPOINT_ADDRESS: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.Web/sites/${{ env.DNETBOT_NAME }}-function/functions/Core_Message_Save
                 TOPIC_RESOURCE: /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RG }}/providers/Microsoft.EventGrid/domains/${{ env.DNETBOT_NAME }}-eventgrid-domain/topics/messages
@@ -197,7 +193,7 @@ jobs:
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
-
+            
             # Logout of Azure CLI
           - name: Logout of Azure
             run: az logout

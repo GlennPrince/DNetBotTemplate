@@ -34,20 +34,20 @@ namespace DNetBotFunctions.Core.Channel
                 var channel = new DiscordChannel(cachedChannel);
 
                 var storeChannel = new ChannelTableEntity(channel.GuildID.ToString(), channel.ID.ToString(), channel);
-                _dataStore.InsertOrMergeObject("Channels", storeChannel);
+                await _dataStore.InsertOrMergeObject("Channels", storeChannel);
 
                 foreach (var userID in channel.Users)
                 {
                     var cachedUser = cache.StringGet("channel_users:" + channel.ID.ToString() + ":" + userID.ToString());
                     var user = new DiscordEmote(cachedUser.ToString());
                     var storeUser = new EmoteTableEntity(user.ID.ToString(), channel.ID.ToString(), user);
-                    _dataStore.InsertOrMergeObject("Users", storeUser);
+                    await _dataStore.InsertOrMergeObject("Users", storeUser);
                 }
             }
             else if (eventGridEvent.EventType == "DNetBot.Channel.Deleted")
             {
                 string[] eventData = eventGridEvent.Data.ToString().Split(':');
-                _dataStore.DeleteObject("Channels", eventData[1], eventData[2]);
+                await _dataStore.DeleteObject("Channels", eventData[1], eventData[2]);
             }
             else if (eventGridEvent.EventType == "DNetBot.Channel.Joined")
             {
@@ -57,12 +57,12 @@ namespace DNetBotFunctions.Core.Channel
                 var cachedUser = cache.StringGet("channel_users:" + eventData[2] + ":" + eventData[1]);
                 var user = new DiscordEmote(cachedUser.ToString());
                 var storeUser = new EmoteTableEntity(eventData[2], eventData[1], user);
-                _dataStore.InsertOrMergeObject("Users", storeUser);
+                await _dataStore.InsertOrMergeObject("Users", storeUser);
             }
             else if (eventGridEvent.EventType == "DNetBot.Channel.Left")
             {
                 string[] eventData = eventGridEvent.Data.ToString().Split(':');
-                _dataStore.DeleteObject("Users", eventData[2], eventData[1]);
+                await _dataStore.DeleteObject("Users", eventData[2], eventData[1]);
             }
         }
     }

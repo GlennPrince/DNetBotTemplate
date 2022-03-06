@@ -34,20 +34,20 @@ namespace DNetBotFunctions.Core.Guild
                 var message = new DiscordMessage(cachedMessage);
 
                 var storeMessage = new MessageTableEntity(message.ChannelId.ToString(), message.MessageId.ToString(), message);
-                _dataStore.InsertOrMergeObject("Messages", storeMessage);
+                await _dataStore.InsertOrMergeObject("Messages", storeMessage);
 
                 foreach (var attachmentID in message.AttachmentIDs)
                 {
                     var cachedAttachment = cache.StringGet("message_attachment:" + message.MessageId.ToString() + ":" + attachmentID.ToString());
                     var attachment = new DiscordAttachment(cachedAttachment.ToString());
                     var storeAttachment = new AttachmentTableEntity(message.MessageId.ToString(), attachment.ID.ToString(), attachment);
-                    _dataStore.InsertOrMergeObject("Attachments", storeAttachment);
+                    await _dataStore.InsertOrMergeObject("Attachments", storeAttachment);
                 }
             }
             else if (eventGridEvent.EventType == "DNetBot.Message.Deleted")
             {
                 string[] eventData = eventGridEvent.Data.ToString().Split(':');
-                _dataStore.DeleteObject("Messages", eventData[1], eventData[2]);
+                await _dataStore.DeleteObject("Messages", eventData[1], eventData[2]);
                 _dataStore.DeleteObject("Attachments", eventData[2]);
             }  
         }

@@ -37,31 +37,31 @@ namespace DNetBotFunctions.Core.Guild
                 var guild = new DiscordGuild(cachedGuild);
 
                 var storeGuild = new GuildTableEntity(guild.Id.ToString(), "Guild.Info", guild);
-                _dataStore.InsertOrMergeObject("Guilds", storeGuild);
+                await _dataStore.InsertOrMergeObject("Guilds", storeGuild);
 
                 foreach (var channelID in guild.ChannelIds)
                 {
                     var cachedChannel = cache.StringGet("channel:" + channelID.ToString());
                     var channel = new DiscordChannel(cachedChannel.ToString());
                     var storeChannel = new ChannelTableEntity(guild.Id.ToString(), channel.ID.ToString(), channel);
-                    _dataStore.InsertOrMergeObject("Channels", storeChannel);
+                    await _dataStore.InsertOrMergeObject("Channels", storeChannel);
 
                     if (guild.CategoryIds.Contains(channelID))
-                        _dataStore.InsertOrMergeObject("CategoryChannels", storeChannel);
+                        await _dataStore.InsertOrMergeObject("CategoryChannels", storeChannel);
 
                     if (guild.VoiceIds.Contains(channelID))
-                        _dataStore.InsertOrMergeObject("VoiceChannels", storeChannel);
+                        await _dataStore.InsertOrMergeObject("VoiceChannels", storeChannel);
                     
                     if(channel.ChannelType == ChannelType.Text)
-                        _dataStore.InsertOrMergeObject("TextChannels", storeChannel);
+                        await _dataStore.InsertOrMergeObject("TextChannels", storeChannel);
                 }
 
                 foreach (var userID in guild.UserIds)
                 {
                     var cachedUser = cache.StringGet("user:" + guild.Id.ToString() + ":" + userID.ToString());
-                    var user = new DiscordEmote(cachedUser.ToString());
-                    var storeUser = new EmoteTableEntity(guild.Id.ToString(), user.ID.ToString(), user);
-                    _dataStore.InsertOrMergeObject("Users", storeUser);
+                    var user = new DiscordUser(cachedUser.ToString());
+                    var storeUser = new UserTableEntity(guild.Id.ToString(), user.ID.ToString(), user);
+                    await _dataStore.InsertOrMergeObject("Users", storeUser);
                 }
 
                 foreach (var roleID in guild.RoleIds)
@@ -69,7 +69,7 @@ namespace DNetBotFunctions.Core.Guild
                     var cachedRole = cache.StringGet("role:" + guild.Id.ToString() + ":" + roleID.ToString());
                     var role = new DiscordRole(cachedRole.ToString());
                     var storeRole = new RoleTableEntity(guild.Id.ToString(), role.ID.ToString(), role);
-                    _dataStore.InsertOrMergeObject("Roles", storeRole);
+                    await _dataStore.InsertOrMergeObject("Roles", storeRole);
                 }
 
                 foreach (var emoteID in guild.EmoteIds)
@@ -77,13 +77,13 @@ namespace DNetBotFunctions.Core.Guild
                     var cachedEmote = cache.StringGet("emote:" + guild.Id.ToString() + ":" + emoteID.ToString());
                     var emote = new DiscordEmote(cachedEmote.ToString());
                     var storeEmote = new EmoteTableEntity(guild.Id.ToString(), emote.ID.ToString(), emote);
-                    _dataStore.InsertOrMergeObject("Emotes", storeEmote);
+                    await _dataStore.InsertOrMergeObject("Emotes", storeEmote);
                 }
             }
             else if (eventGridEvent.EventType == "DNetBot.Guild.Left")
             {
                 string[] eventData = eventGridEvent.Data.ToString().Split(':');
-                _dataStore.DeleteObject("Guilds", eventData[1], "Guild.Info");
+                await _dataStore.DeleteObject("Guilds", eventData[1], "Guild.Info");
 
                 _dataStore.DeleteObject("Channels", eventData[1]);
                 _dataStore.DeleteObject("CategoryChannels", eventData[1]);
