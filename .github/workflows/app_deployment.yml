@@ -111,8 +111,8 @@ jobs:
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name user --output none
                   az eventgrid domain topic create -g $AZURE_RG --domain-name $EVENTGRID_DOMAIN --name returnmessage --output none
             
-            # Proxy Subscribe to the Return Message Topic
-          - name: Subscribe Proxy to Return Message Topic
+            # Proxy Subscribe to the Return Topic
+          - name: Subscribe Proxy to Topics
             uses: azure/CLI@v1
             env:
                 SUBSCRIPTION_NAME: ${{ env.DNETBOT_NAME }}-proxy-returnmessage
@@ -178,7 +178,7 @@ jobs:
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
 
-            # Function Subscribe to the Message Topic for Core Message Save
+            # Function Subscribe to the Channel Topic for Core Message Save
           - name: Subscribe Core Message Save Function to Topic
             uses: azure/CLI@v1
             env:
@@ -193,7 +193,7 @@ jobs:
                   echo ::add-mask::$SUBSCRIPTION_NAME
                   echo ::add-mask::$ENDPOINT_ADDRESS
                   az eventgrid event-subscription create --name $SUBSCRIPTION_NAME --source-resource-id $TOPIC_RESOURCE --endpoint $ENDPOINT_ADDRESS --endpoint-type azurefunction --output none
-            
+
             # Logout of Azure CLI
           - name: Logout of Azure
             run: az logout
