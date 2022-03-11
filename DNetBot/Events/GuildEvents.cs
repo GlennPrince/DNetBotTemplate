@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using DNetBot.Helpers;
 using DNetUtils.Entities;
 using Microsoft.Extensions.Hosting;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DNetBot.Services
@@ -25,8 +26,20 @@ namespace DNetBot.Services
             }
 
             string features = "";
-            foreach (var feature in guild.Features)
-                features += feature + ";";
+            GuildFeatures rawFeatures = guild.Features;
+
+            features += "HasPrivateThreads: " + rawFeatures.HasPrivateThreads.ToString() + ";";
+            features += "HasRoleIcons: " + rawFeatures.HasRoleIcons.ToString() + ";";
+            features += "HasRoleSubscriptions: " + rawFeatures.HasRoleSubscriptions.ToString() + ";";
+            features += "HasTextInVoice: " + rawFeatures.HasTextInVoice.ToString() + ";";
+            features += "HasThreads: " + rawFeatures.HasThreads.ToString() + ";";
+            features += "HasVanityUrl: " + rawFeatures.HasVanityUrl.ToString() + ";";
+            features += "IsHub: " + rawFeatures.IsHub.ToString() + ";";
+            features += "IsLinkedToHub: " + rawFeatures.IsLinkedToHub.ToString() + ";";
+            features += "IsPartnered: " + rawFeatures.IsPartnered.ToString() + ";";
+            features += "IsStaffServer: " + rawFeatures.IsStaffServer.ToString() + ";";
+            features += "IsVerified: " + rawFeatures.IsVerified.ToString() + ";";
+
             cachedData.StringSet("feature:" + guild.Id.ToString(), features);
 
             foreach (var user in guild.Users)
@@ -113,8 +126,20 @@ namespace DNetBot.Services
             }
 
             string features = "";
-            foreach (var feature in guild.Features)
-                features += feature + ";";
+            GuildFeatures rawFeatures = guild.Features;
+
+            features += "HasPrivateThreads: " + rawFeatures.HasPrivateThreads.ToString() + ";";
+            features += "HasRoleIcons: " + rawFeatures.HasRoleIcons.ToString() + ";";
+            features += "HasRoleSubscriptions: " + rawFeatures.HasRoleSubscriptions.ToString() + ";";
+            features += "HasTextInVoice: " + rawFeatures.HasTextInVoice.ToString() + ";";
+            features += "HasThreads: " + rawFeatures.HasThreads.ToString() + ";";
+            features += "HasVanityUrl: " + rawFeatures.HasVanityUrl.ToString() + ";";
+            features += "IsHub: " + rawFeatures.IsHub.ToString() + ";";
+            features += "IsLinkedToHub: " + rawFeatures.IsLinkedToHub.ToString() + ";";
+            features += "IsPartnered: " + rawFeatures.IsPartnered.ToString() + ";";
+            features += "IsStaffServer: " + rawFeatures.IsStaffServer.ToString() + ";";
+            features += "IsVerified: " + rawFeatures.IsVerified.ToString() + ";";
+
             cachedData.StringSet("feature:" + guild.Id.ToString(), features);
 
             foreach (var role in guild.Roles)
@@ -127,6 +152,12 @@ namespace DNetBot.Services
             {
                 var serializedEmote = new DiscordEmote(emote).ToString();
                 cachedData.StringSet("emote:" + guild.Id.ToString() + ":" + emote.Id.ToString(), serializedEmote);
+            }
+
+            foreach(var sticker in guild.Stickers)
+            {
+                var serializedSticker = new DiscordSticker(sticker).ToString();
+                cachedData.StringSet("sticker:" + sticker.Id.ToString(), serializedSticker);
             }
 
             return SendEvent("guild", "GuildAvailable", "DNetBot.Guild.Available", "guild:" + guild.Id.ToString());
@@ -167,8 +198,20 @@ namespace DNetBot.Services
             }
 
             string features = "";
-            foreach (var feature in newGuild.Features)
-                features += feature + ";";
+            GuildFeatures rawFeatures = newGuild.Features;
+
+            features += "HasPrivateThreads: " + rawFeatures.HasPrivateThreads.ToString() + ";";
+            features += "HasRoleIcons: " + rawFeatures.HasRoleIcons.ToString() + ";";
+            features += "HasRoleSubscriptions: " + rawFeatures.HasRoleSubscriptions.ToString() + ";";
+            features += "HasTextInVoice: " + rawFeatures.HasTextInVoice.ToString() + ";";
+            features += "HasThreads: " + rawFeatures.HasThreads.ToString() + ";";
+            features += "HasVanityUrl: " + rawFeatures.HasVanityUrl.ToString() + ";";
+            features += "IsHub: " + rawFeatures.IsHub.ToString() + ";";
+            features += "IsLinkedToHub: " + rawFeatures.IsLinkedToHub.ToString() + ";";
+            features += "IsPartnered: " + rawFeatures.IsPartnered.ToString() + ";";
+            features += "IsStaffServer: " + rawFeatures.IsStaffServer.ToString() + ";";
+            features += "IsVerified: " + rawFeatures.IsVerified.ToString() + ";";
+
             cachedData.StringSet("feature:" + newGuild.Id.ToString(), features);
 
             foreach (var role in newGuild.Roles)
@@ -361,6 +404,38 @@ namespace DNetBot.Services
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Guild", "User: " + user.Id + " Unbanned From: " + guild.Id);
             cachedData.KeyDelete("banned_users:" + guild.Id.ToString() + ":" + user.Id.ToString());
             return SendEvent("user", "UserUnbanned", "DNetBot.User.Unbanned", "banned_users:" + user.Id.ToString() + ":" + guild.Id.ToString());
+        }
+
+        #endregion
+
+        #region Server Sticker Events
+        // Handles processes for when a guild adds a sticker
+        private Task StickerCreated(SocketSticker sticker)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Sticker", "Sticker Created: " + sticker.Id);
+            var serializedSticker = new DiscordSticker(sticker).ToString();
+            cachedData.StringSet("sticker:" + sticker.Id.ToString(), serializedSticker);
+
+            return SendEvent("sticker", "StickerCreated", "DNetBot.Sticker.Created", "role:" + sticker.Id.ToString());
+        }
+
+        // Handles actions for when a guild updates a sticker
+        private Task StickerUpdated(SocketSticker oldSticker, SocketSticker newSticker)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Sticker", "Sticker Updated: " + newSticker.Id);
+            var serializedSticker = new DiscordSticker(newSticker).ToString();
+            cachedData.StringSet("sticker:" + newSticker.Id.ToString(), serializedSticker);
+
+            return SendEvent("sticker", "StickerUpdated", "DNetBot.Sticker.Updated", "sticker:" + newSticker.Id.ToString());
+        }
+
+        // Handles actions for when a guild deletes a sticker
+        private Task StickerDeleted(SocketSticker sticker)
+        {
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "Sticker", "Sticker Deleted: " + sticker.Id);
+            cachedData.KeyDelete("sticker:" + sticker.Id.ToString());
+
+            return SendEvent("sticker", "StickerDeleted", "DNetBot.Sticker.Deleted", "sticker:" + sticker.Id.ToString());
         }
         #endregion
     }

@@ -78,7 +78,8 @@ namespace DNetBot.Services
             // Setup the Discord Client Configuration
             discordClient = new DiscordShardedClient(new DiscordSocketConfig
             {
-                LogLevel = logLevel
+                LogLevel = logLevel,
+                AlwaysDownloadUsers = true
             });
 
             ConfigureEventHandlers();
@@ -149,27 +150,32 @@ namespace DNetBot.Services
             discordClient.RoleUpdated += async (o, n) => await RoleUpdated(o, n);
             discordClient.RoleDeleted += async r => await RoleDeleted(r);
 
+            // Events that occur on a server when sticker information changes
+            discordClient.GuildStickerCreated += async s => await StickerCreated(s);
+            discordClient.GuildStickerUpdated += async (o, n) => await StickerUpdated(o, n);
+            discordClient.GuildStickerDeleted += async s => await StickerDeleted(s);
+
             // Events that occur when user information on a server changes
             discordClient.UserBanned += async (u, g) => await UserBan(u, g);
             discordClient.UserUnbanned += async (u, g) => await UserUnban(u, g);
 
             // User based events
             discordClient.UserJoined += async u => await UserJoined(u);
-            discordClient.UserLeft += async u => await UserLeft(u);
+            discordClient.UserLeft += async (g, u) => await UserLeft(u, g);
             discordClient.UserUpdated += async (o, n) => await UserUpdate(o, n);
-            discordClient.GuildMemberUpdated += async (o, n) => await MemberUpdate(o, n);
+            discordClient.GuildMemberUpdated += async (o, n) => await MemberUpdate(o.Value, n);
             discordClient.RecipientAdded += async u => await PrivateGroupAdd(u);
             discordClient.RecipientRemoved += async u => await PrivateGroupRemove(u);
 
             // General message handling event
             discordClient.MessageReceived += async m => await ReceiveMessage(m);
-            discordClient.MessageDeleted += async (m, c) => await DeletedMessage(m.Id, c);
+            discordClient.MessageDeleted += async (m, c) => await DeletedMessage(m.Id, c.Value);
             discordClient.MessageUpdated += async (m, u, c) => await UpdatedMessage(m.Id, u, c);
 
             // Reactions Handling
-            discordClient.ReactionAdded += async (m, c, r) => await ReactionAdded(m, c, r);
-            discordClient.ReactionRemoved += async (m, c, r) => await ReactionRemoved(m, c, r);
-            discordClient.ReactionsCleared += async (m, c) => await ReactionCleared(m, c);
+            discordClient.ReactionAdded += async (m, c, r) => await ReactionAdded(m, c.Value, r);
+            discordClient.ReactionRemoved += async (m, c, r) => await ReactionRemoved(m, c.Value, r);
+            discordClient.ReactionsCleared += async (m, c) => await ReactionCleared(m, c.Value);
 
             // Bot specific events
             discordClient.CurrentUserUpdated += async (o, n) => await BotUpdated(o, n);

@@ -2,6 +2,7 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace DNetUtils.Entities
@@ -11,6 +12,7 @@ namespace DNetUtils.Entities
         // Channel Attributes
         public ulong ID { get; set; }
         public int Type { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public ulong? GuildID { get; set; }
         public int? Position { get; set; }
         public string Name { get; set; }
@@ -19,9 +21,13 @@ namespace DNetUtils.Entities
         public int? BitRate { get; set; }
         public int? UserLimit { get; set; }
         public int? RateLimit { get; set; }
+        public bool? IsLive  { get; set; }
+        public bool? DiscoverableDisabled { get; set; }
+        public int PrivacyLevel { get; set; }
         public List<ulong> Recipients { get; set; }
         public List<ulong> CategorizedChannels { get; set; }
         public List<ulong> Users { get; set; }
+        public List<ulong> Speakers { get; set; }
         public ulong? CategoryID { get; set; }
         public string Mention { get; set; }
         public ChannelType ChannelType { get; set; }
@@ -51,6 +57,7 @@ namespace DNetUtils.Entities
             GuildID = channel.Guild.Id;
             Name = channel.Name;
             Position = channel.Position;
+            CreatedAt = channel.CreatedAt;
             if (channel.Users != null)
             {
                 foreach (var user in channel.Users)
@@ -109,6 +116,8 @@ namespace DNetUtils.Entities
             Name = channel.Name;
             Position = channel.Position;
             BitRate = channel.Bitrate;
+            CreatedAt = channel.CreatedAt;
+            Mention = channel.Mention;
             UserLimit = channel.UserLimit;
             CategoryID = channel.CategoryId;
             ChannelType = ChannelType.Voice;
@@ -144,6 +153,7 @@ namespace DNetUtils.Entities
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
             }
+            CreatedAt = channel.CreatedAt;
         }
 
         public DiscordChannel(RestDMChannel channel)
@@ -170,6 +180,7 @@ namespace DNetUtils.Entities
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
             }
+            CreatedAt = channel.CreatedAt;
         }
 
         public DiscordChannel(RestGroupChannel channel)
@@ -183,6 +194,7 @@ namespace DNetUtils.Entities
                     Recipients.Add(recipient.Id);
             }
             ChannelType = ChannelType.Group;
+            CreatedAt = channel.CreatedAt;
         }
 
         public DiscordChannel(SocketCategoryChannel channel)
@@ -204,6 +216,7 @@ namespace DNetUtils.Entities
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
             }
+            CreatedAt = channel.CreatedAt;
         }
 
         public DiscordChannel(RestCategoryChannel channel)
@@ -212,6 +225,7 @@ namespace DNetUtils.Entities
             Name = channel.Name;
             Position = channel.Position;
             ChannelType = ChannelType.Category;
+            CreatedAt = channel.CreatedAt;
         }
 
         public DiscordChannel(SocketNewsChannel channel)
@@ -233,6 +247,7 @@ namespace DNetUtils.Entities
                 foreach (var user in channel.Users)
                     Users.Add(user.Id);
             }
+            CreatedAt = channel.CreatedAt;
         }
 
         public DiscordChannel(RestNewsChannel channel)
@@ -249,7 +264,35 @@ namespace DNetUtils.Entities
             ChannelType = ChannelType.News;
         }
 
-        
+        public DiscordChannel(SocketStageChannel channel)
+        {
+            ID = channel.Id;
+            Name = channel.Name;
+            GuildID = channel.Guild.Id;
+            Name = channel.Name;
+            Position = channel.Position;
+            Topic = channel.Topic;
+            BitRate = channel.Bitrate;
+            IsLive = channel.IsLive;
+            DiscoverableDisabled = channel.IsDiscoverableDisabled;
+            PrivacyLevel = (int)channel.PrivacyLevel;
+            UserLimit = channel.UserLimit;
+            CategoryID = channel.CategoryId;
+            Mention = channel.Mention;
+            ChannelType = ChannelType.Stage;
+            Users = new List<ulong>();
+            if (channel.Users != null)
+            {
+                foreach (var user in channel.Users)
+                    Users.Add(user.Id);
+            }
+            if (channel.Speakers != null)
+            {
+                foreach (var user in channel.Users)
+                    Speakers.Add(user.Id);
+            }
+            CreatedAt = channel.CreatedAt;
+        }
 
         public DiscordChannel(string json)
         {

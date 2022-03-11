@@ -50,7 +50,7 @@ namespace DNetBot.Services
             return SendEvent("messages", "NewMessage", "DNetBot.Message.NewMessage", "message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString());
         }
 
-        private Task DeletedMessage(ulong messageId, ISocketMessageChannel channel)
+        private Task DeletedMessage(ulong messageId, IMessageChannel channel)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Message Deleted From Channel ID : " + channel.Id.ToString() + " | Message Id: " + messageId);
             cachedData.KeyDelete("message:" + channel.Id.ToString() + ":" + messageId.ToString());
@@ -96,7 +96,7 @@ namespace DNetBot.Services
             return SendEvent("messages", "UpdatedMessage", "DNetBot.Message.Updated", "message:" + message.Channel.Id.ToString() + ":" + message.Id.ToString());
         }
 
-        private Task ReactionAdded(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
+        private Task ReactionAdded(Cacheable<IUserMessage, ulong> message, IMessageChannel channel, SocketReaction reaction)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reaction Added to Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
             var serializedReaction = reaction.ToString();
@@ -104,14 +104,14 @@ namespace DNetBot.Services
             return SendEvent("reaction", "AddReaction", "DNetBot.Reaction.Add", "message_reaction:" + message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name);
         }
 
-        private Task ReactionRemoved(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction)
+        private Task ReactionRemoved(Cacheable<IUserMessage, ulong> message, IMessageChannel channel, SocketReaction reaction)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reaction Removed off Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
             cachedData.KeyDelete("message_reaction:" + message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name);
             return SendEvent("reaction", "RemoveReaction", "DNetBot.Reaction.Delete", "message_reaction:" + message.Id.ToString() + ":" + reaction.UserId.ToString() + ":" + reaction.Emote.Name);
         }
 
-        private Task ReactionCleared(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel)
+        private Task ReactionCleared(Cacheable<IUserMessage, ulong> message, IMessageChannel channel)
         {
             Formatter.GenerateLog(_logger, LogSeverity.Info, "Message", "Reactions Cleared off Message ID: " + message.Id + " | From Channel ID: " + channel.Id);
             var endpoints = _connectionMultiplexer.GetEndPoints();

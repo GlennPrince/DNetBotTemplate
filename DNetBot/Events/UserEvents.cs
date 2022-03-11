@@ -37,12 +37,12 @@ namespace DNetBot.Services
         }
 
         // Handles any actions when a user leaves a server
-        private Task UserLeft(SocketGuildUser user)
+        private Task UserLeft(SocketUser user, SocketGuild guild)
         {
-            Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left Server: " + user.Guild.Id);
+            Formatter.GenerateLog(_logger, LogSeverity.Info, "User", "User: " + user.Id + " left Server: " + guild.Id);
             var serializedUser = new DiscordUser(user).ToString();
-            cachedData.KeyDelete("guild_users:" + user.Guild.Id + ":" + user.Id.ToString());
-            return SendEvent("user", "UserLeft", "DNetBot.User.Left", "guild_users:" + user.Guild.Id + ":" + user.Id.ToString());
+            cachedData.KeyDelete("guild_users:" + guild.Id + ":" + user.Id.ToString());
+            return SendEvent("user", "UserLeft", "DNetBot.User.Left", "guild_users:" + guild.Id + ":" + user.Id.ToString());
         }
 
         private Task PrivateGroupAdd(SocketGroupUser user)

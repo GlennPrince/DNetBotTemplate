@@ -61,6 +61,10 @@ namespace DNetUtils.Entities
         /// </summary>
         public ICollection<string> EmbedTitles { get; set; }
 
+        public IDictionary<string, int> Reactions { get; set; }
+
+        public ICollection<ulong> StickerIDs { get; set; }
+
         public DiscordMessage() { }
 
         public DiscordMessage(SocketMessage message)
@@ -92,6 +96,14 @@ namespace DNetUtils.Entities
             EmbedTitles = new List<string>();
             foreach (var embed in message.Embeds)
                 EmbedTitles.Add(embed.Title);
+
+            Reactions = new Dictionary<string, int>();
+            foreach (var reaction in message.Reactions)
+                Reactions.Add(reaction.Key.Name, reaction.Value.ReactionCount);
+
+            StickerIDs = new List<ulong>();
+            foreach (var sticker in message.Stickers)
+                StickerIDs.Add(sticker.Id);
         }
 
         public DiscordMessage(RestMessage message)

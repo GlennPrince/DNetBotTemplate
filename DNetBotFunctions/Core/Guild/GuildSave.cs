@@ -24,7 +24,7 @@ namespace DNetBotFunctions.Core.Guild
             _redis = redis;
             _dataStore = new DataStoreClient();
         }
-
+ 
         [FunctionName("Core_Guild_Save")]
         public async void Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
         {
@@ -39,7 +39,7 @@ namespace DNetBotFunctions.Core.Guild
                 var storeGuild = new GuildTableEntity(guild.Id.ToString(), "Guild.Info", guild);
                 await _dataStore.InsertOrMergeObject("Guilds", storeGuild);
 
-                foreach (var channelID in guild.ChannelIds)
+                foreach (var channelID in guild.CategoryIds)
                 {
                     var cachedChannel = cache.StringGet("channel:" + channelID.ToString());
                     var channel = new DiscordChannel(cachedChannel.ToString());
@@ -78,6 +78,14 @@ namespace DNetBotFunctions.Core.Guild
                     var emote = new DiscordEmote(cachedEmote.ToString());
                     var storeEmote = new EmoteTableEntity(guild.Id.ToString(), emote.ID.ToString(), emote);
                     await _dataStore.InsertOrMergeObject("Emotes", storeEmote);
+                }
+
+                foreach (var stickerID in guild.StickerIds)
+                {
+                    var cachedSticker = cache.StringGet("sticker:" + stickerID.ToString());
+                    var sticker = new DiscordSticker(cachedSticker.ToString());
+                    var storesticker = new StickerTableEntity(sticker.GuildID.ToString(), stickerID.ToString(), sticker);
+                    await _dataStore.InsertOrMergeObject("Stickers", storesticker);
                 }
             }
             else if (eventGridEvent.EventType == "DNetBot.Guild.Left")

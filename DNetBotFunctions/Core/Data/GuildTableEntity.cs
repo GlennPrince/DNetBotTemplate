@@ -8,14 +8,20 @@ namespace DNetBotFunctions.Core.Data
 {
     public class GuildTableEntity : TableEntity
     {
+        #region Guild Configuration
+
         /// <summary> 
         /// The Id / Snowflake of this guild. 
         /// </summary>
-        public string Id { get; set; }
+        public ulong Id { get; set; }
         /// <summary> 
         /// The name of this guild. 
         /// </summary>
         public string Name { get; set; }
+        /// <summary> 
+        /// The description of this guild. 
+        /// </summary>
+        public string Description { get; set; }
         /// <summary> 
         /// The Id for the Guild Icon 
         /// </summary>
@@ -32,6 +38,9 @@ namespace DNetBotFunctions.Core.Data
         /// The URL for the Guild splash image 
         /// </summary>
         public string SplashURL { get; set; }
+
+        public string DiscoverySplashId { get; set; }
+        public string DiscoverySplashUrl { get; set; }
         /// <summary> 
         /// The Id for the Guild banner image 
         /// </summary>
@@ -41,17 +50,9 @@ namespace DNetBotFunctions.Core.Data
         /// </summary>
         public string BannerURL { get; set; }
         /// <summary> 
-        /// The number of Members in the Guild 
-        /// </summary>
-        public int MemberCount { get; set; }
-        /// <summary> 
         /// The amount of time (in seconds) a user must be inactive in a voice channel before they are automatically moved to the AFK voice channel. 
         /// </summary>
         public int AFKTimeout { get; set; }
-        /// <summary> 
-        /// Indicates whether this guild is embeddable (i.e. can use wIdget). 
-        /// </summary>
-        public bool IsEmbeddable { get; set; }
         /// <summary> 
         /// The default message notification setting for this Guild (0 = All, 1 = Mentions Only) 
         /// </summary>
@@ -69,45 +70,93 @@ namespace DNetBotFunctions.Core.Data
         /// </summary>
         public int VerificationLevel { get; set; }
         /// <summary> 
-        /// Application Id of the guild creator if it is bot-created. 
+        /// The preferred locale of this guild in IETF BCP 47 language tag format. 
         /// </summary>
-        public string ApplicationId { get; set; }
+        public string PreferredLocale { get; set; }
+
+        public bool IsBoostProgressBarEnabled { get; }
         /// <summary> 
-        /// Owner Id of the guild creator if it is not bot-created. 
+        /// The NSFW Level for the Guild(0 = Default, 1 = Explicit, 2 = Safe, 3 = Age Restricted). 
         /// </summary>
-        public string OwnerId { get; set; }
+        public int NsfwLevel { get; set; }
+        public bool IsWidgetEnabled { get; set; }
+
+        #endregion
+
+        #region Guild Statistics
+
         /// <summary> 
-        /// Id for the Default SocketTextChannel 
+        /// The number of Members in the Guild 
         /// </summary>
-        public string DefaultChannelId { get; set; }
-        /// <summary> 
-        /// Id for the Embed Channel (the channel set in the guild's wIdget settings) 
-        /// </summary>
-        public string EmbedChannelId { get; set; }
-        /// <summary> 
-        /// Id for the everyone role 
-        /// </summary>
-        public string EveryoneId { get; set; }
-        /// <summary> 
-        /// Id for the SocketTextChannel that receives randomized welcome messages 
-        /// </summary>
-        public string SystemChannelId { get; set; }
+        public int? MemberCount { get; set; }
         /// <summary> 
         /// Date the Guild was Created 
         /// </summary>
         public DateTime CreatedAt { get; set; }
-        /// <summary> 
-        /// Premium Tier for the Guild (0 = None, 1 = Tier 1 Boosts, 2 = Tier 2 Boosts, 3 = Tier 3 Boosts) 
-        /// </summary>
-        public int PremiumTier { get; set; }
-        /// <summary> 
-        /// A string containing the vanity invite code for the Server 
-        /// </summary>
-        public string VanityURLCode { get; set; }
+
         /// <summary> 
         /// This is the number of users who have boosted this guild. 
         /// </summary>
         public int PremiumSubscriptionCount { get; set; }
+
+        public int? MaxPresences { get; set; }
+        public int? MaxMembers { get; set; }
+        public int? MaxVideoChannelUsers { get; set; }
+        //
+        // Summary:
+        //     Indicates whether the client is connected to this guild.
+        public bool IsConnected { get; set; }
+        public bool HasAllMembers { get; set; }
+        public ulong MaxUploadLimit { get; set; }
+        public int MaxBitrate { get; set; }
+
+        #endregion
+
+        #region Guild Identifiers
+
+        /// <summary> 
+        /// Application Id of the guild creator if it is bot-created. 
+        /// </summary>
+        public ulong? ApplicationId { get; set; }
+        /// <summary> 
+        /// Owner Id of the guild creator if it is not bot-created. 
+        /// </summary>
+        public ulong? OwnerId { get; set; }
+        /// <summary> 
+        /// Id for the everyone role 
+        /// </summary>
+        public ulong? EveryoneId { get; set; }
+        /// <summary> 
+        /// Id for the Default SocketTextChannel 
+        /// </summary>
+        public ulong? DefaultChannelId { get; set; }
+        /// <summary> 
+        /// Id for the SocketTextChannel that receives randomized welcome messages 
+        /// </summary>
+        public ulong? SystemChannelId { get; set; }
+        /// <summary> 
+        /// Id for the channel set within the server's widget settings; null if none is set. 
+        /// </summary>
+        public ulong? WidgetChannelId { get; set; }
+        /// <summary> 
+        /// Id for the text channel with the guild rules; null if none is set. 
+        /// </summary>
+        public ulong? RulesChannelId { get; set; }
+        /// <summary> 
+        /// Id for the text channel where admins and moderators of Community guilds receive notices from Discord; null if none is set.
+        /// </summary>
+        public ulong? PublicUpdatesChannelId { get; set; }
+        /// <summary> 
+        /// Id for the Socket Voice Channel that the AFK users will be moved to after they have idled for too long; null if none is set.
+        /// </summary>
+        public ulong? AFKChannelId { get; set; }
+        /// <summary> 
+        /// Voice Region for the Server 
+        /// </summary>
+        public string VoiceRegionId { get; set; }
+
+        #endregion
+
 
         public GuildTableEntity() { }
 
@@ -116,31 +165,51 @@ namespace DNetBotFunctions.Core.Data
             PartitionKey = _partitionKey;
             RowKey = _rowKey;
 
-            Id = guild.Id.ToString();
+            // Guild Configuration Items
+            Id = guild.Id;
             Name = guild.Name;
+            Description = guild.Description;
             IconId = guild.IconId;
             IconURL = guild.IconURL;
             SplashId = guild.SplashId;
             SplashURL = guild.SplashURL;
+            DiscoverySplashId = guild.DiscoverySplashId;
+            DiscoverySplashUrl = guild.DiscoverySplashUrl;
             BannerId = guild.BannerId;
             BannerURL = guild.BannerURL;
-            MemberCount = guild.MemberCount;
             AFKTimeout = guild.AFKTimeout;
-            IsEmbeddable = guild.IsEmbeddable;
             DefaultMessageNotifications = guild.DefaultMessageNotifications;
             ExplicitContentFilter = guild.ExplicitContentFilter;
             MfaLevel = guild.MfaLevel;
             VerificationLevel = guild.VerificationLevel;
-            ApplicationId = guild.ApplicationId.ToString();
-            OwnerId = guild.OwnerId.ToString();
-            DefaultChannelId = guild.DefaultChannelId.ToString();
-            EmbedChannelId = guild.EmbedChannelId.ToString();
-            EveryoneId = guild.EveryoneId.ToString();
-            SystemChannelId = guild.SystemChannelId.ToString();
+            PreferredLocale = guild.PreferredLocale.ToString();
+            IsBoostProgressBarEnabled = guild.IsBoostProgressBarEnabled;
+            NsfwLevel = guild.NsfwLevel;
+            IsWidgetEnabled = guild.IsWidgetEnabled;
+
+            // Guild Statistical Items
+            MemberCount = guild.MemberCount;
             CreatedAt = guild.CreatedAt.UtcDateTime;
-            PremiumTier = guild.PremiumTier;
-            VanityURLCode = guild.VanityURLCode;
             PremiumSubscriptionCount = guild.PremiumSubscriptionCount;
+            MaxPresences = guild.MaxPresences;
+            MaxMembers = guild.MaxMembers;
+            MaxVideoChannelUsers = guild.MaxVideoChannelUsers;
+            IsConnected = guild.IsConnected;
+            HasAllMembers = guild.HasAllMembers;
+            MaxUploadLimit = guild.MaxUploadLimit;
+            MaxBitrate = guild.MaxBitrate;
+
+            // Guild Identifiers
+            ApplicationId = guild.ApplicationId;
+            OwnerId = guild.OwnerId;
+            EveryoneId = guild.EveryoneId;
+            DefaultChannelId = guild.DefaultChannelId;
+            SystemChannelId = guild.SystemChannelId;
+            WidgetChannelId = guild.WidgetChannelId;
+            RulesChannelId = guild.RulesChannelId;
+            PublicUpdatesChannelId = guild.PublicUpdatesChannelId;
+            AFKChannelId = guild.AFKChannelId;
+            VoiceRegionId = guild.VoiceRegionId;
         }
     }
 }
